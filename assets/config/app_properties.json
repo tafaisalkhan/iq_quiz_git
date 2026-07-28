@@ -1,0 +1,7 @@
+{
+  "enableLogin": false,
+  "enableSocialLogin": false,
+  "enableFirebaseDynamicAuth": false,
+  "enableFirebaseDatabase": false,
+  "enableAds": true
+}

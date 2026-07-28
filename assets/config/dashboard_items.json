@@ -1,0 +1,434 @@
+[
+  {
+    "id": "pattern_matching",
+    "title": "Spatial Pattern Matrix",
+    "description": "Raven's style visual matrix puzzles & spatial reasoning.",
+    "iconName": "bubble_chart_outlined",
+    "colorHex": "FF14B8A6",
+    "questions": [
+      {
+        "questionText": "Analyze the circle pattern addition matrix. In each row, the third circle is the union of the first two. Which circle completes the grid?",
+        "options": [
+          "Circle with all 4 quadrants colored",
+          "Circle with only top-left colored",
+          "Circle with only bottom-left colored",
+          "Circle with no quadrants colored"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "The rule is addition: Column 3 = Column 1 + Column 2. In Row 3, we add (Top-Left + Bottom-Right) and (Top-Right + Bottom-Left), which gives a circle with all four quadrants colored.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FF3B82F6", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FF3B82F6"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FF3B82F6", "#FF3B82F6", "#FFFFFFFF"] } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FF3B82F6", "#FF3B82F6", "#FF3B82F6", "#FF3B82F6"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 4, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } }
+        ]
+      },
+      {
+        "questionText": "Observe the rotation of the triangles in the matrix. Each triangle rotates 90 degrees clockwise from left to right. Which direction should the missing triangle point?",
+        "options": [
+          "Pointing Down",
+          "Pointing Left",
+          "Pointing Up",
+          "Pointing Right"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Each triangle rotates 90 degrees clockwise in each step: Up -> Right -> Down. Row 3 follows Down -> Left -> Up. Thus, the missing triangle points Up.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "triangle", "attributes": { "direction": "up" } },
+          { "shapeType": "triangle", "attributes": { "direction": "right" } },
+          { "shapeType": "triangle", "attributes": { "direction": "down" } },
+          { "shapeType": "triangle", "attributes": { "direction": "right" } },
+          { "shapeType": "triangle", "attributes": { "direction": "down" } },
+          { "shapeType": "triangle", "attributes": { "direction": "left" } },
+          { "shapeType": "triangle", "attributes": { "direction": "down" } },
+          { "shapeType": "triangle", "attributes": { "direction": "left" } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "triangle", "attributes": { "direction": "down" } },
+          { "shapeType": "triangle", "attributes": { "direction": "left" } },
+          { "shapeType": "triangle", "attributes": { "direction": "up" } },
+          { "shapeType": "triangle", "attributes": { "direction": "right" } }
+        ]
+      },
+      {
+        "questionText": "In this grid of houses, each row and column contains a unique combination of roof shapes (Triangular, Flat, Curved) and door shapes (Rectangular, Arched, Square). Which house completes the pattern?",
+        "options": [
+          "House with Flat roof and Rectangular door",
+          "House with Curved roof and Arched door",
+          "House with Triangular roof and Square door",
+          "House with Flat roof and Square door"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "Following the Latin Square rules, each shape combination must occur exactly once in each row and column. The missing cell must contain a Flat roof (the only roof shape missing from Column 3 and Row 3) and a Rectangular door (missing from Row 3 and Column 3).",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "flat", "door": "arched", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "curved", "door": "square", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "flat", "door": "square", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "curved", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "arched", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "curved", "door": "arched", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "square", "color": "#FFEF4444" } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "house", "attributes": { "roof": "flat", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "curved", "door": "arched", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "square", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "flat", "door": "square", "color": "#FFEF4444" } }
+        ]
+      },
+      {
+        "questionText": "Observe the progression of star points. The number of points increases incrementally in each row. Which star completes the grid?",
+        "options": [
+          "5-pointed star",
+          "6-pointed star",
+          "7-pointed star",
+          "8-pointed star"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Points increase cell-by-cell. Row 1 has stars with 3, 4, 5 points. Row 2 has 4, 5, 6 points. Row 3 has 5, 6, 7 points. Therefore, the missing star has 7 points.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "star", "attributes": { "points": 3 } },
+          { "shapeType": "star", "attributes": { "points": 4 } },
+          { "shapeType": "star", "attributes": { "points": 5 } },
+          { "shapeType": "star", "attributes": { "points": 4 } },
+          { "shapeType": "star", "attributes": { "points": 5 } },
+          { "shapeType": "star", "attributes": { "points": 6 } },
+          { "shapeType": "star", "attributes": { "points": 5 } },
+          { "shapeType": "star", "attributes": { "points": 6 } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "star", "attributes": { "points": 5 } },
+          { "shapeType": "star", "attributes": { "points": 6 } },
+          { "shapeType": "star", "attributes": { "points": 7 } },
+          { "shapeType": "star", "attributes": { "points": 8 } }
+        ]
+      },
+      {
+        "questionText": "Identify the relationship between the outer container shape and the inner shape in the grid. What completes the final row?",
+        "options": [
+          "Triangle containing Triangle",
+          "Circle containing Triangle",
+          "Square containing Circle",
+          "Triangle containing Square"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "The outer container shape is constant per row (Row 1: Circle, Row 2: Square, Row 3: Triangle). The inner shape progresses (Square -> Triangle -> Circle) shifted by one. For the last cell in Row 3, the container is a Triangle, and the inner shape is a Triangle.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "circle", "attributes": { "innerShape": "square" } },
+          { "shapeType": "circle", "attributes": { "innerShape": "triangle" } },
+          { "shapeType": "circle", "attributes": { "innerShape": "circle" } },
+          { "shapeType": "square", "attributes": { "innerShape": "triangle" } },
+          { "shapeType": "square", "attributes": { "innerShape": "circle" } },
+          { "shapeType": "square", "attributes": { "innerShape": "square" } },
+          { "shapeType": "triangle", "attributes": { "innerShape": "circle" } },
+          { "shapeType": "triangle", "attributes": { "innerShape": "square" } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "triangle", "attributes": { "innerShape": "triangle" } },
+          { "shapeType": "circle", "attributes": { "innerShape": "triangle" } },
+          { "shapeType": "square", "attributes": { "innerShape": "circle" } },
+          { "shapeType": "triangle", "attributes": { "innerShape": "square" } }
+        ]
+      },
+      {
+        "questionText": "Observe the orientation and count of internal lines within each square cell. Which square completes the bottom row?",
+        "options": [
+          "Square with 3 diagonal lines",
+          "Square with 3 vertical lines",
+          "Square with 2 horizontal lines",
+          "Square with 1 diagonal line"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "Row 1 contains vertical lines (1, 2, 3). Row 2 contains horizontal lines (1, 2, 3). Row 3 contains diagonal lines (1, 2, 3). The missing square must have 3 diagonal lines.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "square", "attributes": { "lines": 1, "direction": "vertical" } },
+          { "shapeType": "square", "attributes": { "lines": 2, "direction": "vertical" } },
+          { "shapeType": "square", "attributes": { "lines": 3, "direction": "vertical" } },
+          { "shapeType": "square", "attributes": { "lines": 1, "direction": "horizontal" } },
+          { "shapeType": "square", "attributes": { "lines": 2, "direction": "horizontal" } },
+          { "shapeType": "square", "attributes": { "lines": 3, "direction": "horizontal" } },
+          { "shapeType": "square", "attributes": { "lines": 1, "direction": "diagonal" } },
+          { "shapeType": "square", "attributes": { "lines": 2, "direction": "diagonal" } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "square", "attributes": { "lines": 3, "direction": "diagonal" } },
+          { "shapeType": "square", "attributes": { "lines": 3, "direction": "vertical" } },
+          { "shapeType": "square", "attributes": { "lines": 2, "direction": "horizontal" } },
+          { "shapeType": "square", "attributes": { "lines": 1, "direction": "diagonal" } }
+        ]
+      },
+      {
+        "questionText": "Count the number of dots inside each triangle cell across the grid. What is the correct dot count for the missing cell?",
+        "options": [
+          "3 dots",
+          "4 dots",
+          "5 dots",
+          "6 dots"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Dots count increases across and down: Row 1 has 1, 2, 3 dots. Row 2 has 2, 3, 4 dots. Row 3 has 3, 4, 5 dots. The final cell must have 5 dots.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 1 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 2 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 3 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 2 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 3 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 4 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 3 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 4 } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 3 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 4 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 5 } },
+          { "shapeType": "triangle", "attributes": { "direction": "up", "dots": 6 } }
+        ]
+      },
+      {
+        "questionText": "Look at the color distributions of the houses in each row and column. Which house color completes the matrix?",
+        "options": [
+          "Yellow House",
+          "Red House",
+          "Blue House",
+          "Green House"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Each row and column must contain exactly one Red house, one Blue house, and one Yellow house. Row 3 contains Yellow and Red, so the missing house must be Blue.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FF3B82F6" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFFFD60A" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FF3B82F6" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFFFD60A" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFFFD60A" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFFFD60A" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FFEF4444" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FF3B82F6" } },
+          { "shapeType": "house", "attributes": { "roof": "triangular", "door": "rectangular", "color": "#FF10B981" } }
+        ]
+      },
+      {
+        "questionText": "An 8-slice circle has a single shaded slice rotating clockwise. Observe the pattern to guess the missing state.",
+        "options": [
+          "Circle with Slice 7 shaded",
+          "Circle with Slice 1 shaded",
+          "Circle with Slice 5 shaded",
+          "Circle with Slice 3 shaded"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "The shaded slice starts at index 0 (Slice 1) and moves 1 slice clockwise in each step: 0 -> 1 -> 2. In Row 2 it is 2 -> 3 -> 4. In Row 3 it is 4 -> 5 -> 6 (Slice 7). Therefore, index 6 (Slice 7) is shaded.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } },
+          { "shapeType": "circle", "attributes": { "sections": 8, "sliceColors": ["#FFFFFFFF", "#FFFFFFFF", "#FF3B82F6", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF", "#FFFFFFFF"] } }
+        ]
+      },
+      {
+        "questionText": "Each cell contains concentric circular rings. Discover the growth rule to identify the correct missing ring count.",
+        "options": [
+          "3 rings",
+          "4 rings",
+          "5 rings",
+          "6 rings"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Concentric rings count increases: Row 1 has 1, 2, 3 rings. Row 2 has 2, 3, 4 rings. Row 3 has 3, 4, 5 rings. The missing circle contains 5 concentric rings.",
+        "hasVisual": true,
+        "visualType": "matrix",
+        "matrixData": [
+          { "shapeType": "circle", "attributes": { "rings": 1 } },
+          { "shapeType": "circle", "attributes": { "rings": 2 } },
+          { "shapeType": "circle", "attributes": { "rings": 3 } },
+          { "shapeType": "circle", "attributes": { "rings": 2 } },
+          { "shapeType": "circle", "attributes": { "rings": 3 } },
+          { "shapeType": "circle", "attributes": { "rings": 4 } },
+          { "shapeType": "circle", "attributes": { "rings": 3 } },
+          { "shapeType": "circle", "attributes": { "rings": 4 } },
+          { "shapeType": "question", "attributes": {} }
+        ],
+        "optionVisuals": [
+          { "shapeType": "circle", "attributes": { "rings": 3 } },
+          { "shapeType": "circle", "attributes": { "rings": 4 } },
+          { "shapeType": "circle", "attributes": { "rings": 5 } },
+          { "shapeType": "circle", "attributes": { "rings": 6 } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "numerical_sequence",
+    "title": "Numerical Series & Sequences",
+    "description": "Mathematical progressions & quantitative pattern recognition.",
+    "iconName": "notifications_active_outlined",
+    "colorHex": "FFF59E0B",
+    "questions": [
+      {
+        "questionText": "What is the next number in the sequence: 3, 5, 9, 17, ?",
+        "options": ["25", "33", "35", "41"],
+        "correctOptionIndex": 1,
+        "explanation": "The difference between consecutive numbers doubles each time: +2, +4, +8, +16. 17 + 16 = 33."
+      },
+      {
+        "questionText": "Find the missing square number: 1, 4, 9, 16, 25, ?",
+        "options": ["30", "35", "36", "49"],
+        "correctOptionIndex": 2,
+        "explanation": "The sequence consists of square numbers: 1², 2², 3², 4², 5², and the next is 6² = 36."
+      },
+      {
+        "questionText": "Complete the numeric progression: 2, 6, 12, 20, 30, ?",
+        "options": ["40", "42", "44", "46"],
+        "correctOptionIndex": 1,
+        "explanation": "The difference increases by 2 each time: +4, +6, +8, +10, +12. 30 + 12 = 42."
+      }
+    ]
+  },
+  {
+    "id": "iq_statement",
+    "title": "Deductive Syllogisms & Logic",
+    "description": "Formal deductive logic & statement argument validation.",
+    "iconName": "extension_rounded",
+    "colorHex": "FFEF4444",
+    "questions": [
+      {
+        "questionText": "Statement: All cats are animals. All animals have four legs. Conclusion: All cats have four legs.",
+        "options": ["True", "False", "Insufficient Data", "None of the above"],
+        "correctOptionIndex": 0,
+        "explanation": "Since cats are animals, and all animals have four legs, then cats must have four legs according to the premises."
+      },
+      {
+        "questionText": "Statement: Some doctors are teachers. All teachers are human. Conclusion: Some doctors are human.",
+        "options": ["True", "False", "Insufficient Data", "None of the above"],
+        "correctOptionIndex": 0,
+        "explanation": "Since some doctors are teachers and all teachers are human, those doctors who are teachers are also human."
+      },
+      {
+        "questionText": "Statement: No rectangles are circles. All squares are rectangles. Conclusion: No squares are circles.",
+        "options": ["True", "False", "Insufficient Data", "None of the above"],
+        "correctOptionIndex": 0,
+        "explanation": "Since squares are subset of rectangles and rectangles have no intersection with circles, squares have no intersection with circles."
+      }
+    ]
+  },
+  {
+    "id": "logical_dependency",
+    "title": "Analytical & Time Reasoning",
+    "description": "Work rate, speed-distance-time & dependency scheduling.",
+    "iconName": "account_tree_rounded",
+    "colorHex": "FF8B5CF6",
+    "questions": [
+      {
+        "questionText": "Worker A can complete a task in 10 hours, and Worker B can complete the same task in 15 hours. If they work together, how many hours will it take to complete the task?",
+        "options": ["5 hours", "6 hours", "8 hours", "12.5 hours"],
+        "correctOptionIndex": 1,
+        "explanation": "The combined rate is: (1 / 10) + (1 / 15) = (3 / 30) + (2 / 30) = 5 / 30 = 1 / 6. Working together, they complete 1/6 of the task per hour, requiring 6 hours total."
+      },
+      {
+        "questionText": "Train A leaves a station traveling east at 60 km/h. At the same time, Train B leaves traveling west at 90 km/h. How far apart will they be after 2 hours?",
+        "options": ["150 km", "200 km", "300 km", "360 km"],
+        "correctOptionIndex": 2,
+        "explanation": "Because they travel in opposite directions, their relative speed of separation is the sum: 60 + 90 = 150 km/h. In 2 hours, the total distance separated is 150 * 2 = 300 km."
+      },
+      {
+        "questionText": "A car can travel 15 km on 1 liter of fuel. If a trip is 120 km long and fuel costs $2 per liter, how much will the fuel cost for a round trip?",
+        "options": ["$8", "$16", "$32", "$24"],
+        "correctOptionIndex": 2,
+        "explanation": "A round trip is 120 * 2 = 240 km. The fuel required is 240 / 15 = 16 liters. Total cost = 16 * $2 = $32."
+      },
+      {
+        "questionText": "Task A depends on Task B, which depends on Task C. If Task C takes 3 hours, Task B takes 4 hours, and Task A takes 2 hours, and they must run sequentially, what is the total execution time?",
+        "options": ["4 hours", "7 hours", "9 hours", "12 hours"],
+        "correctOptionIndex": 2,
+        "explanation": "Because of the linear dependency (C -> B -> A), they cannot run in parallel. The total time is the sum of all tasks: 3 + 4 + 2 = 9 hours."
+      },
+      {
+        "questionText": "A car traveling at 80 km/h is 40 km behind a truck traveling at 60 km/h in the same direction. How many hours will it take for the car to overtake the truck?",
+        "options": ["1 hour", "2 hours", "3 hours", "4 hours"],
+        "correctOptionIndex": 1,
+        "explanation": "The relative speed at which the car closes the gap is 80 - 60 = 20 km/h. To cover the 40 km gap, it will take: 40 / 20 = 2 hours."
+      },
+      {
+        "questionText": "Pipe A can fill a water tank in 4 hours, while Pipe B can empty the same tank in 6 hours. If both pipes are opened simultaneously when the tank is empty, how long will it take to fill the tank?",
+        "options": ["10 hours", "12 hours", "8 hours", "5 hours"],
+        "correctOptionIndex": 1,
+        "explanation": "The net rate of filling per hour is: (1 / 4) - (1 / 6) = (3 / 12) - (2 / 12) = 1 / 12. Therefore, it will take 12 hours to completely fill the tank."
+      },
+      {
+        "questionText": "A team of 5 workers can build a wall in 10 days. If 2 workers fall ill before the project starts, how many days will the remaining 3 workers take to complete the wall?",
+        "options": ["6 days", "15 days", "16.7 days", "20 days"],
+        "correctOptionIndex": 2,
+        "explanation": "Total work is measured in man-days: 5 workers * 10 days = 50 man-days. With 3 workers, the duration is: 50 / 3 = 16.67 days."
+      },
+      {
+        "questionText": "At 80 km/h, a car consumes 1 liter of fuel per 16 km. At 120 km/h, consumption increases to 1 liter per 12 km. How much more fuel (in liters) is consumed at 120 km/h compared to 80 km/h for a 240 km journey?",
+        "options": ["5 liters", "15 liters", "20 liters", "10 liters"],
+        "correctOptionIndex": 0,
+        "explanation": "At 80 km/h, fuel used = 240 / 16 = 15 liters. At 120 km/h, fuel used = 240 / 12 = 20 liters. The excess fuel is: 20 - 15 = 5 liters."
+      },
+      {
+        "questionText": "An engine assembly takes 4 hours (Path 1), and a chassis assembly takes 6 hours (Path 2). Both must be finished before the final assembly (2 hours) can begin. If Paths 1 and 2 run in parallel, what is the total production time?",
+        "options": ["8 hours", "12 hours", "6 hours", "10 hours"],
+        "correctOptionIndex": 0,
+        "explanation": "Since Path 1 and Path 2 run in parallel, the stage takes max(4, 6) = 6 hours. Adding the final 2-hour assembly stage gives: 6 + 2 = 8 hours."
+      },
+      {
+        "questionText": "A train 200 meters long is traveling at a speed of 36 km/h. How many seconds will it take to completely cross a bridge that is 300 meters long?",
+        "options": ["15 seconds", "30 seconds", "50 seconds", "60 seconds"],
+        "correctOptionIndex": 2,
+        "explanation": "First convert speed: 36 km/h * (5/18) = 10 m/s. The total distance to cross is the train length + bridge length = 200 + 300 = 500 meters. Time = 500 / 10 = 50 seconds."
+      }
+    ]
+  }
+]
