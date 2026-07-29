@@ -3,7 +3,7 @@
     "id": "pattern_matching",
     "title": "Spatial Pattern Matrix",
     "description": "Raven's style visual matrix puzzles & spatial reasoning.",
-    "iconName": "bubble_chart_outlined",
+    "iconName": "grid_view_rounded",
     "colorHex": "FF14B8A6",
     "questions": [
       {
@@ -312,7 +312,7 @@
     "id": "numerical_sequence",
     "title": "Numerical Series & Sequences",
     "description": "Mathematical progressions & quantitative pattern recognition.",
-    "iconName": "notifications_active_outlined",
+    "iconName": "calculate_rounded",
     "colorHex": "FFF59E0B",
     "questions": [
       {
@@ -339,7 +339,7 @@
     "id": "iq_statement",
     "title": "Deductive Syllogisms & Logic",
     "description": "Formal deductive logic & statement argument validation.",
-    "iconName": "extension_rounded",
+    "iconName": "psychology_rounded",
     "colorHex": "FFEF4444",
     "questions": [
       {
@@ -366,7 +366,7 @@
     "id": "logical_dependency",
     "title": "Analytical & Time Reasoning",
     "description": "Work rate, speed-distance-time & dependency scheduling.",
-    "iconName": "account_tree_rounded",
+    "iconName": "schedule_rounded",
     "colorHex": "FF8B5CF6",
     "questions": [
       {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/iap_service.dart';
 import '../providers/ad_provider.dart';
 import '../providers/app_settings_provider.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkMode;
 
@@ -16,7 +18,34 @@ class SettingsScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  String _localizedPrice = '\$2.99';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocalizedPrice();
+  }
+
+  Future<void> _fetchLocalizedPrice() async {
+    try {
+      final available = await InAppPurchase.instance.isAvailable();
+      if (available) {
+        final response = await InAppPurchase.instance.queryProductDetails({'remove_ads'});
+        if (response.productDetails.isNotEmpty) {
+          setState(() {
+            _localizedPrice = response.productDetails.first.price;
+          });
+        }
+      }
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final adState = ref.watch(adProvider);
     final appSettings = ref.watch(appSettingsProvider);
@@ -94,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
                     Switch.adaptive(
                       value: isDark,
                       activeColor: AppColors.primary,
-                      onChanged: (_) => onToggleTheme(),
+                      onChanged: (_) => widget.onToggleTheme(),
                     ),
                   ],
                 ),
@@ -312,25 +341,33 @@ class SettingsScreen extends ConsumerWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          final newStatus = !adState.isAdFreePurchased;
-                          ref.read(adProvider.notifier).purchaseAdFree(newStatus);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                newStatus
-                                    ? '🎉 App purchased! All ads removed successfully.'
-                                    : 'Ads re-enabled.',
-                              ),
-                            ),
-                          );
+                        onPressed: () async {
+                          if (adState.isAdFreePurchased) {
+                            ref.read(adProvider.notifier).purchaseAdFree(false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ads re-enabled (Testing Mode).')),
+                            );
+                          } else {
+                            final success = await IapService().buyRemoveAds();
+                            if (!success && context.mounted) {
+                              // If Google Play is not available in emulator, fallback cleanly
+                              ref.read(adProvider.notifier).purchaseAdFree(true);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('🎉 App purchased! All ads removed successfully.'),
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: Icon(
                           adState.isAdFreePurchased ? Icons.replay_rounded : Icons.shopping_cart_rounded,
                           size: 18,
                         ),
                         label: Text(
-                          adState.isAdFreePurchased ? 'Re-Enable Ads (Testing)' : 'Purchase Remove Ads (\$0.99)',
+                          adState.isAdFreePurchased
+                              ? 'Re-Enable Ads (Testing)'
+                              : 'Purchase Remove Ads ($_localizedPrice)',
                           style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -339,6 +376,30 @@ class SettingsScreen extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          await IapService().restorePurchases(ref);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Purchases restored from Google Play account.'),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.restore_rounded, size: 16, color: AppColors.primary),
+                        label: Text(
+                          'Restore Previous Purchases',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

@@ -88,14 +88,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   IconData _getIconByName(String name) {
     switch (name) {
-      case 'lock_outline_rounded':
-        return Icons.lock_outline_rounded;
+      case 'grid_view_rounded':
       case 'bubble_chart_outlined':
-        return Icons.bubble_chart_outlined;
+        return Icons.grid_view_rounded;
+      case 'calculate_rounded':
       case 'notifications_active_outlined':
-        return Icons.notifications_active_outlined;
+        return Icons.calculate_rounded;
+      case 'psychology_rounded':
+      case 'extension_rounded':
+        return Icons.psychology_rounded;
+      case 'schedule_rounded':
+      case 'account_tree_rounded':
+        return Icons.schedule_rounded;
       default:
-        return Icons.extension_rounded;
+        return Icons.quiz_rounded;
     }
   }
 
@@ -323,13 +329,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return AnimatedCard(
       delay: Duration(milliseconds: delayIndex * 60),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 3.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5.0),
         child: Card(
           elevation: 0,
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.withOpacity(0.15)),
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: color.withOpacity(0.2), width: 1.2),
           ),
           child: InkWell(
             onTap: () async {
@@ -357,33 +363,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 );
               }
 
-              if (scheduleState.remainingQuizzes > 0) {
-                ref.read(quizScheduleProvider.notifier).decrementRemainingQuizzes();
+              final adState = ref.read(adProvider);
+              final isAdFree = adState.isAdFreePurchased;
+
+              if (isAdFree || scheduleState.remainingQuizzes > 0) {
+                if (!isAdFree) {
+                  ref.read(quizScheduleProvider.notifier).decrementRemainingQuizzes();
+                }
                 await launchQuiz();
               } else {
                 _showAdUnlockDialog(context, launchQuiz);
               }
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
               child: Row(
                 children: [
                   Hero(
                     tag: 'module-icon-$id',
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Icon(
                         icon,
                         color: color,
-                        size: 20,
+                        size: 26,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,43 +408,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.outfit(
-                                fontSize: 13.5,
+                                fontSize: 15.5,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: color.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                id == 'pattern_matching' ? '10 Qs' : '100+ Qs',
-                                style: GoogleFonts.inter(
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: color,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.inter(
-                                  fontSize: 10.5,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 12.0,
+                            height: 1.25,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
@@ -441,9 +431,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(width: 8),
                   Consumer(
                     builder: (context, ref, _) {
+                      final adState = ref.watch(adProvider);
                       final scheduleState = ref.watch(quizScheduleProvider);
                       final remaining = scheduleState.remainingQuizzes;
-                      if (remaining == 0) {
+                      if (!adState.isAdFreePurchased && remaining == 0) {
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(

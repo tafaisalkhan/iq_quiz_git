@@ -1987,9 +1987,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           setState(() {
             _isQuizCompleted = true;
           });
-
-          // Run clapping sound when user gets 80% or higher score
-          if (percent >= 0.8) {
+          // Run clapping sound when user completes quiz successfully (score >= 50%)
+          if (percent >= 0.5) {
             try {
               final player = AudioPlayer();
               player.setAsset('assets/audio/applause.wav').then((_) => player.play());
@@ -2785,12 +2784,15 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
       scoreDesc = 'Excellent score of $_score out of ${widget.questions.length}. You have sharp analytic skills.';
     }
 
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+    return Stack(
+      children: [
+        if (percent >= 0.5) const Positioned.fill(child: GlitterParticleOverlay()),
+        Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
             AnimatedCard(
               delay: const Duration(milliseconds: 50),
               child: Container(
@@ -2911,6 +2913,91 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           ],
         ),
       ),
+    ),
+  ],
+);
+  }
+}
+
+class GlitterParticleOverlay extends StatefulWidget {
+  const GlitterParticleOverlay({super.key});
+
+  @override
+  State<GlitterParticleOverlay> createState() => _GlitterParticleOverlayState();
+}
+
+class _GlitterParticleOverlayState extends State<GlitterParticleOverlay> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final List<_Particle> _particles = List.generate(50, (i) => _Particle());
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          size: Size.infinite,
+          painter: _GlitterPainter(progress: _controller.value, particles: _particles),
+        );
+      },
     );
   }
+}
+
+class _Particle {
+  final double x = math.Random().nextDouble();
+  final double speed = 0.6 + math.Random().nextDouble() * 0.7;
+  final double size = 5 + math.Random().nextDouble() * 7;
+  final Color color = [
+    const Color(0xFFFFD60A), // Gold
+    const Color(0xFF3B82F6), // Blue
+    const Color(0xFFEC4899), // Pink
+    const Color(0xFF10B981), // Green
+    const Color(0xFFA855F7), // Purple
+  ][math.Random().nextInt(5)];
+  final double rotationSpeed = (math.Random().nextDouble() - 0.5) * 6;
+}
+
+class _GlitterPainter extends CustomPainter {
+  final double progress;
+  final List<_Particle> particles;
+
+  _GlitterPainter({required this.progress, required this.particles});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final p in particles) {
+      final y = (progress * p.speed * size.height) % (size.height + 40) - 20;
+      final x = p.x * size.width + math.sin(progress * 6 + p.x * 10) * 15;
+      final opacity = (1.0 - (y / size.height)).clamp(0.0, 1.0);
+
+      final paint = Paint()
+        ..color = p.color.withOpacity(opacity * 0.9)
+        ..style = PaintingStyle.fill;
+
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(progress * p.rotationSpeed);
+      canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.6), paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GlitterPainter oldDelegate) => true;
 }

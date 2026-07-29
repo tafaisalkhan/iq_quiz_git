@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
+import '../../../../core/services/iap_service.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/quiz_schedule_provider.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
@@ -54,6 +55,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     ref.read(quizScheduleProvider.notifier).startScheduleChecker(context);
+    IapService().initialize(ref);
   }
 
   @override
