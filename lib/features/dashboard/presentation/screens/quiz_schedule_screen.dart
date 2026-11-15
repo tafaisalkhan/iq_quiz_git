@@ -6,6 +6,7 @@ import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/animated_card.dart';
 import '../../../../core/widgets/custom_page_route.dart';
+import '../../../settings/presentation/providers/ad_provider.dart';
 import '../providers/quiz_schedule_provider.dart';
 import 'detail_screen.dart';
 
@@ -67,7 +68,8 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
         }
 
         final count = mathMin(schedule.questionsCount, pooledQuestions.length);
-        final List<dynamic> shuffledList = List.from(pooledQuestions)..shuffle();
+        final List<dynamic> shuffledList = List.from(pooledQuestions)
+          ..shuffle();
         final finalQuestions = shuffledList.sublist(0, count);
 
         if (!mounted) return;
@@ -86,9 +88,9 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
         );
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error starting test: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error starting test: $e')));
         }
       } finally {
         if (mounted) {
@@ -99,8 +101,11 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
       }
     }
 
-    if (scheduleState.remainingQuizzes > 0) {
-      ref.read(quizScheduleProvider.notifier).decrementRemainingQuizzes();
+    final adFree = ref.read(adProvider).isAdFreePurchased;
+    if (adFree || scheduleState.remainingQuizzes > 0) {
+      if (!adFree) {
+        ref.read(quizScheduleProvider.notifier).decrementRemainingQuizzes();
+      }
       await loadAndLaunch();
     } else {
       _showAdUnlockDialog(context, () async {
@@ -175,7 +180,6 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -204,7 +208,10 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                       ),
                       if (schedules.length < 2)
                         IconButton(
-                          icon: const Icon(Icons.add_alarm_rounded, color: AppColors.primary),
+                          icon: const Icon(
+                            Icons.add_alarm_rounded,
+                            color: AppColors.primary,
+                          ),
                           onPressed: _addDailySchedule,
                           tooltip: 'Add Daily Schedule',
                         ),
@@ -221,7 +228,9 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                           color: isDark ? AppColors.surfaceDark : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
                           ),
                         ),
                         child: Column(
@@ -235,7 +244,9 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                             Text(
                               'No Schedules Set',
                               style: GoogleFonts.outfit(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -264,14 +275,20 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(20.0),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.surfaceDark : Colors.white,
+                              color: isDark
+                                  ? AppColors.surfaceDark
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                                color: isDark
+                                    ? AppColors.borderDark
+                                    : AppColors.borderLight,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
+                                  color: Colors.black.withOpacity(
+                                    isDark ? 0.2 : 0.02,
+                                  ),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -281,17 +298,27 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.12),
+                                        color: AppColors.primary.withOpacity(
+                                          0.12,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.alarm_on_rounded, size: 14, color: AppColors.primary),
+                                          const Icon(
+                                            Icons.alarm_on_rounded,
+                                            size: 14,
+                                            color: AppColors.primary,
+                                          ),
                                           const SizedBox(width: 6),
                                           Text(
                                             schedule.timeOfDay,
@@ -307,12 +334,21 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                                     IconButton(
                                       constraints: const BoxConstraints(),
                                       padding: EdgeInsets.zero,
-                                      icon: const Icon(Icons.delete_outline_rounded,
-                                          color: AppColors.error, size: 20),
+                                      icon: const Icon(
+                                        Icons.delete_outline_rounded,
+                                        color: AppColors.error,
+                                        size: 20,
+                                      ),
                                       onPressed: () {
-                                        ref.read(quizScheduleProvider.notifier).removeSchedule(schedule.id);
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Schedule deleted.')),
+                                        ref
+                                            .read(quizScheduleProvider.notifier)
+                                            .removeSchedule(schedule.id);
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Schedule deleted.'),
+                                          ),
                                         );
                                       },
                                     ),
@@ -338,24 +374,37 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                                 SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton.icon(
-                                    onPressed: () => _startScheduledTest(schedule),
+                                    onPressed: () =>
+                                        _startScheduledTest(schedule),
                                     icon: Icon(
-                                      scheduleState.remainingQuizzes == 0
+                                      scheduleState.remainingQuizzes == 0 &&
+                                              !ref
+                                                  .watch(adProvider)
+                                                  .isAdFreePurchased
                                           ? Icons.lock_open_rounded
                                           : Icons.play_arrow_rounded,
                                       color: Colors.white,
                                     ),
                                     label: Text(
-                                      scheduleState.remainingQuizzes == 0
+                                      scheduleState.remainingQuizzes == 0 &&
+                                              !ref
+                                                  .watch(adProvider)
+                                                  .isAdFreePurchased
                                           ? 'Unlock & Start Quiz'
                                           : 'Start Daily Quiz',
                                     ),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: scheduleState.remainingQuizzes == 0
+                                      backgroundColor:
+                                          scheduleState.remainingQuizzes == 0 &&
+                                              !ref
+                                                  .watch(adProvider)
+                                                  .isAdFreePurchased
                                           ? AppColors.warning
                                           : AppColors.primary,
                                       foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -378,7 +427,10 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
                         label: const Text('Schedule New Daily Quiz'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: AppColors.primary, width: 1.5),
+                          side: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -399,7 +451,9 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Row(
             children: [
               const Icon(Icons.lock_clock_rounded, color: AppColors.warning),
@@ -419,25 +473,44 @@ class _QuizScheduleScreenState extends ConsumerState<QuizScheduleScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             ElevatedButton.icon(
-              icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 18),
+              icon: const Icon(
+                Icons.play_circle_fill_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
               label: Text(
                 'Watch Ad to Unlock',
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
                 AdService().showRewardedAd(context, (coins) {
-                  ref.read(quizScheduleProvider.notifier).incrementRemainingQuizzes();
-                  ref.read(quizScheduleProvider.notifier).decrementRemainingQuizzes();
+                  ref
+                      .read(quizScheduleProvider.notifier)
+                      .incrementRemainingQuizzes();
+                  ref
+                      .read(quizScheduleProvider.notifier)
+                      .decrementRemainingQuizzes();
                   onUnlocked();
                 });
               },
@@ -514,9 +587,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
             Text(
               'SELECT QUIZ CATEGORY',
               style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
@@ -524,7 +598,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
               dropdownColor: isDark ? AppColors.surfaceDark : Colors.white,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
               items: _categories.map((cat) {
                 return DropdownMenuItem(
@@ -536,8 +613,9 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
                 if (val != null) {
                   setState(() {
                     _selectedCategoryId = val;
-                    _selectedCategoryTitle =
-                        _categories.firstWhere((c) => c['id'] == val)['title']!;
+                    _selectedCategoryTitle = _categories.firstWhere(
+                      (c) => c['id'] == val,
+                    )['title']!;
                   });
                 }
               },
@@ -547,9 +625,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
             Text(
               'NUMBER OF QUESTIONS: $_questionsCount (MAX 10)',
               style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
             Slider(
               value: _questionsCount.toDouble(),
@@ -569,9 +648,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
             Text(
               'SELECT SCHEDULED TIME',
               style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
             const SizedBox(height: 8),
             InkWell(
@@ -588,7 +668,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
               },
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(12),
@@ -598,8 +681,10 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded,
-                            color: AppColors.primary),
+                        const Icon(
+                          Icons.access_time_rounded,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 12),
                         Text(
                           _selectedTime.format(context),
@@ -663,7 +748,9 @@ class _AddScheduleBottomSheetState extends State<AddScheduleBottomSheet> {
                 child: Text(
                   'Create Schedule',
                   style: GoogleFonts.inter(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

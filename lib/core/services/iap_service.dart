@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/settings/presentation/providers/ad_provider.dart';
@@ -26,7 +25,7 @@ class IapService {
     );
 
     // Auto-query active purchases on launch
-    restorePurchases(ref);
+    unawaited(restorePurchases(ref));
   }
 
   void dispose() {
@@ -35,18 +34,22 @@ class IapService {
 
   /// Trigger buy flow for "remove_ads" product
   Future<bool> buyRemoveAds() async {
-    final bool available = await _iap.isAvailable();
-    if (!available) return false;
-
-    final ProductDetailsResponse response =
-        await _iap.queryProductDetails({removeAdsProductId});
-
-    if (response.productDetails.isNotEmpty) {
-      final ProductDetails productDetails = response.productDetails.first;
-      final PurchaseParam purchaseParam = PurchaseParam(productDetails: productDetails);
+    try {
+      if (!await _iap.isAvailable()) return false;
+      final response = await _iap.queryProductDetails({removeAdsProductId});
+      if (response.error != null) return false;
+      final products = response.productDetails.where(
+        (product) => product.id == removeAdsProductId,
+      );
+      if (products.isEmpty) return false;
+      final ProductDetails productDetails = products.first;
+      final PurchaseParam purchaseParam = PurchaseParam(
+        productDetails: productDetails,
+      );
       return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+    } catch (_) {
+      return false;
     }
-    return false;
   }
 
   /// Restore purchases from Google Play account
@@ -59,17 +62,19 @@ class IapService {
     } catch (_) {}
   }
 
-  void _handlePurchaseUpdates(List<PurchaseDetails> purchaseDetailsList, WidgetRef ref) {
+  void _handlePurchaseUpdates(
+    List<PurchaseDetails> purchaseDetailsList,
+    WidgetRef ref,
+  ) {
     for (final purchaseDetails in purchaseDetailsList) {
       if (purchaseDetails.productID == removeAdsProductId) {
         if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
-          
           // Entitle user: Disable all ads across app permanently
-          ref.read(adProvider.notifier).purchaseAdFree(true);
+          unawaited(ref.read(adProvider.notifier).purchaseAdFree(true));
 
           if (purchaseDetails.pendingCompletePurchase) {
-            _iap.completePurchase(purchaseDetails);
+            unawaited(_iap.completePurchase(purchaseDetails));
           }
         }
       }

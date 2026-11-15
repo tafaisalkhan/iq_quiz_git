@@ -70,18 +70,17 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
     ref.onDispose(() {
       _scheduleCheckerTimer?.cancel();
     });
-    return QuizScheduleState(
-      schedules: [],
-      results: [],
-      remainingQuizzes: 2,
-    );
+    return QuizScheduleState(schedules: [], results: [], remainingQuizzes: 2);
   }
 
   void startScheduleChecker(BuildContext context) {
     _scheduleCheckerTimer?.cancel();
-    _scheduleCheckerTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
+    _scheduleCheckerTimer = Timer.periodic(const Duration(seconds: 10), (
+      _,
+    ) async {
       final now = DateTime.now();
-      final currentHHmm = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      final currentHHmm =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       final todayStr = now.toIso8601String().split('T')[0];
 
       try {
@@ -92,19 +91,21 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
             final alreadyFired = prefs.getBool(fireKey) ?? false;
             if (!alreadyFired) {
               await prefs.setBool(fireKey, true);
-              
+
               // Trigger native Android status bar notification
               NotificationService().showImmediateNativeNotification(
                 id: schedule.id.hashCode,
                 title: 'Scheduled Quiz Ready! ⏰',
-                body: 'It\'s time for your scheduled ${schedule.categoryTitle} quiz! (${schedule.questionsCount} questions)',
+                body:
+                    'It\'s time for your scheduled ${schedule.categoryTitle} quiz! (${schedule.questionsCount} questions)',
               );
 
               if (context.mounted) {
                 NotificationService().showNotification(
                   context,
                   title: 'Scheduled Quiz Ready! ⏰',
-                  message: 'It\'s time for your scheduled ${schedule.categoryTitle} quiz! (${schedule.questionsCount} questions)',
+                  message:
+                      'It\'s time for your scheduled ${schedule.categoryTitle} quiz! (${schedule.questionsCount} questions)',
                   icon: Icons.alarm_on_rounded,
                   duration: const Duration(seconds: 8),
                 );
@@ -119,7 +120,7 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
   Future<void> _loadFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Load schedules
       final schedulesJson = prefs.getStringList('quiz_schedules') ?? [];
       final loadedSchedules = schedulesJson.map((s) {
@@ -135,16 +136,19 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
 
       // Load results
       final resultsJson = prefs.getStringList('quiz_results') ?? [];
-      final loadedResults = resultsJson.map((r) {
-        final map = json.decode(r) as Map<String, dynamic>;
-        return TestResult(
-          id: map['id'] as String,
-          categoryTitle: map['categoryTitle'] as String,
-          score: map['score'] as int,
-          totalQuestions: map['totalQuestions'] as int,
-          date: DateTime.parse(map['date'] as String),
-        );
-      }).toList();
+      final loadedResults = resultsJson
+          .map((r) {
+            final map = json.decode(r) as Map<String, dynamic>;
+            return TestResult(
+              id: map['id'] as String,
+              categoryTitle: map['categoryTitle'] as String,
+              score: map['score'] as int,
+              totalQuestions: map['totalQuestions'] as int,
+              date: DateTime.parse(map['date'] as String),
+            );
+          })
+          .where((result) => result.categoryTitle != 'Daily Quiz')
+          .toList();
 
       // Always reset to 2 free quizzes on app startup/restart
       state = QuizScheduleState(
@@ -160,13 +164,17 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
   Future<void> _saveSchedulesToPrefs(List<QuizSchedule> list) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final stringList = list.map((s) => json.encode({
-        'id': s.id,
-        'categoryId': s.categoryId,
-        'categoryTitle': s.categoryTitle,
-        'questionsCount': s.questionsCount,
-        'timeOfDay': s.timeOfDay,
-      })).toList();
+      final stringList = list
+          .map(
+            (s) => json.encode({
+              'id': s.id,
+              'categoryId': s.categoryId,
+              'categoryTitle': s.categoryTitle,
+              'questionsCount': s.questionsCount,
+              'timeOfDay': s.timeOfDay,
+            }),
+          )
+          .toList();
       await prefs.setStringList('quiz_schedules', stringList);
     } catch (_) {}
   }
@@ -174,13 +182,17 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
   Future<void> _saveResultsToPrefs(List<TestResult> list) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final stringList = list.map((r) => json.encode({
-        'id': r.id,
-        'categoryTitle': r.categoryTitle,
-        'score': r.score,
-        'totalQuestions': r.totalQuestions,
-        'date': r.date.toIso8601String(),
-      })).toList();
+      final stringList = list
+          .map(
+            (r) => json.encode({
+              'id': r.id,
+              'categoryTitle': r.categoryTitle,
+              'score': r.score,
+              'totalQuestions': r.totalQuestions,
+              'date': r.date.toIso8601String(),
+            }),
+          )
+          .toList();
       await prefs.setStringList('quiz_results', stringList);
     } catch (_) {}
   }
@@ -209,7 +221,8 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
         NotificationService().scheduleNativeDailyNotification(
           id: schedule.id.hashCode,
           title: 'Scheduled Quiz Ready! ⏰',
-          body: 'It\'s time for your scheduled ${schedule.categoryTitle} quiz! Tap to start.',
+          body:
+              'It\'s time for your scheduled ${schedule.categoryTitle} quiz! Tap to start.',
           hour: hour,
           minute: minute,
         );
@@ -237,7 +250,9 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
   }
 
   void decrementRemainingQuizzes() {
-    final newValue = state.remainingQuizzes > 0 ? state.remainingQuizzes - 1 : 0;
+    final newValue = state.remainingQuizzes > 0
+        ? state.remainingQuizzes - 1
+        : 0;
     state = state.copyWith(remainingQuizzes: newValue);
     _saveRemainingQuizzes(newValue);
   }
@@ -249,4 +264,7 @@ class QuizScheduleNotifier extends Notifier<QuizScheduleState> {
   }
 }
 
-final quizScheduleProvider = NotifierProvider<QuizScheduleNotifier, QuizScheduleState>(QuizScheduleNotifier.new);
+final quizScheduleProvider =
+    NotifierProvider<QuizScheduleNotifier, QuizScheduleState>(
+      QuizScheduleNotifier.new,
+    );

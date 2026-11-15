@@ -4,10 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../../../core/services/iap_service.dart';
+import '../../../../core/services/ad_service.dart';
+import '../../../../core/config/app_config.dart';
+import '../../../settings/presentation/providers/ad_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/quiz_schedule_provider.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 import 'dashboard_screen.dart';
+import 'daily_quiz_screen.dart';
 import 'quiz_schedule_screen.dart';
 import 'result_screen.dart';
 
@@ -27,15 +31,18 @@ class MainShell extends ConsumerStatefulWidget {
 
 class _MainShellState extends ConsumerState<MainShell> {
   late List<Widget> _screens;
+  int _tabChangesSinceAd = 0;
 
   @override
   void initState() {
     super.initState();
+    IapService().initialize(ref);
     _screens = [
       DashboardScreen(
         onToggleTheme: widget.onToggleTheme,
         isDarkMode: widget.isDarkMode,
       ),
+      const DailyQuizScreen(),
       QuizScheduleScreen(
         onToggleTheme: widget.onToggleTheme,
         isDarkMode: widget.isDarkMode,
@@ -55,7 +62,23 @@ class _MainShellState extends ConsumerState<MainShell> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     ref.read(quizScheduleProvider.notifier).startScheduleChecker(context);
-    IapService().initialize(ref);
+  }
+
+  @override
+  void dispose() {
+    IapService().dispose();
+    super.dispose();
+  }
+
+  void _selectDestination(int index) {
+    if (index == ref.read(navigationProvider)) return;
+    ref.read(navigationProvider.notifier).setIndex(index);
+    if (!AppConfig.enableAds || ref.read(adProvider).isAdFreePurchased) return;
+    _tabChangesSinceAd++;
+    if (_tabChangesSinceAd >= 3) {
+      _tabChangesSinceAd = 0;
+      AdService().showInterstitialAd(context, () {});
+    }
   }
 
   @override
@@ -68,6 +91,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             onToggleTheme: widget.onToggleTheme,
             isDarkMode: widget.isDarkMode,
           ),
+          const DailyQuizScreen(),
           QuizScheduleScreen(
             onToggleTheme: widget.onToggleTheme,
             isDarkMode: widget.isDarkMode,
@@ -95,10 +119,7 @@ class _MainShellState extends ConsumerState<MainShell> {
           children: [
             const AdBannerWidget(isTopBanner: true),
             Expanded(
-              child: IndexedStack(
-                index: currentIndex,
-                children: _screens,
-              ),
+              child: IndexedStack(index: currentIndex, children: _screens),
             ),
           ],
         ),
@@ -130,28 +151,51 @@ class _MainShellState extends ConsumerState<MainShell> {
               child: NavigationBar(
                 selectedIndex: currentIndex,
                 height: 54,
-                onDestinationSelected: (index) {
-                  ref.read(navigationProvider.notifier).setIndex(index);
-                },
+                onDestinationSelected: _selectDestination,
                 destinations: const [
                   NavigationDestination(
                     icon: Icon(Icons.home_outlined, size: 20),
-                    selectedIcon: Icon(Icons.home, color: AppColors.primary, size: 20),
+                    selectedIcon: Icon(
+                      Icons.home,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                     label: 'Home',
                   ),
                   NavigationDestination(
+                    icon: Icon(Icons.today_outlined, size: 20),
+                    selectedIcon: Icon(
+                      Icons.today_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    label: 'Daily',
+                  ),
+                  NavigationDestination(
                     icon: Icon(Icons.quiz_outlined, size: 20),
-                    selectedIcon: Icon(Icons.quiz, color: AppColors.primary, size: 20),
+                    selectedIcon: Icon(
+                      Icons.quiz,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                     label: 'Quiz',
                   ),
                   NavigationDestination(
                     icon: Icon(Icons.insights_outlined, size: 20),
-                    selectedIcon: Icon(Icons.insights, color: AppColors.primary, size: 20),
+                    selectedIcon: Icon(
+                      Icons.insights,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                     label: 'Result',
                   ),
                   NavigationDestination(
                     icon: Icon(Icons.settings_outlined, size: 20),
-                    selectedIcon: Icon(Icons.settings, color: AppColors.primary, size: 20),
+                    selectedIcon: Icon(
+                      Icons.settings,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                     label: 'Settings',
                   ),
                 ],

@@ -47,7 +47,7 @@
 	<true/>
 	<!-- AdMob App ID (required by Google Mobile Ads SDK on iOS) -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-1852108665659812~4950039925</string>
+	<string>ca-app-pub-3940256099942544~3347511713</string>
 	<!-- SKAdNetwork entries for privacy-safe attribution -->
 	<key>SKAdNetworkItems</key>
 	<array>

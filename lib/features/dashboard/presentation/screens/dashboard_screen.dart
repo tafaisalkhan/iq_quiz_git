@@ -13,6 +13,7 @@ import '../../../../core/widgets/shimmer_loading.dart';
 import '../../../settings/presentation/providers/ad_provider.dart';
 import '../../../settings/presentation/providers/app_settings_provider.dart';
 import '../providers/quiz_schedule_provider.dart';
+import '../providers/navigation_provider.dart';
 import 'detail_screen.dart';
 
 
@@ -189,6 +190,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Card(
+                child: ListTile(
+                  leading: const Icon(Icons.today_rounded, color: AppColors.primary),
+                  title: const Text('Today’s Daily Quiz'),
+                  subtitle: const Text('Your questions and progress stay saved after a restart.'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => ref.read(navigationProvider.notifier).setIndex(1),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
               child: Row(

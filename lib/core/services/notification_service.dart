@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../theme/app_colors.dart';
+import 'daily_quiz_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -49,7 +49,7 @@ class NotificationService {
       scheduleNativeDailyNotification(
         id: 999,
         title: 'Daily IQ Quiz Reminder 🧠',
-        body: 'Don\'t forget to take your daily IQ quiz today and train your brain!',
+        body: 'Your Daily Quiz is ready. Open the Daily tab to keep your record going!',
         hour: 10,
         minute: 0,
       );
@@ -118,7 +118,7 @@ class NotificationService {
         body,
         tzScheduled,
         notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
@@ -132,21 +132,16 @@ class NotificationService {
     } catch (_) {}
   }
 
-  /// Checks and displays the daily notification banner once per day
+  /// Remind the user on each app launch while today's quiz is unfinished.
   Future<void> checkAndShowDailyNotification(BuildContext context) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final todayStr = DateTime.now().toIso8601String().split('T')[0];
-      final lastDate = prefs.getString('last_daily_notification_date');
-
-      if (lastDate != todayStr) {
-        await prefs.setString('last_daily_notification_date', todayStr);
-        
+      final history = await DailyQuizService().loadHistory();
+      if (history.resultFor(DateTime.now()) == null) {
         // Show native Android status bar notification
         showImmediateNativeNotification(
           id: 888,
           title: 'Daily IQ Assessment Ready 🧠',
-          body: 'Your 2 free daily cognitive quiz sessions are unlocked! Train your brain today.',
+          body: 'Today\'s Daily Quiz is ready in the Daily tab.',
         );
 
         if (!context.mounted) return;
@@ -156,7 +151,7 @@ class NotificationService {
           showNotification(
             context,
             title: 'Daily IQ Assessment Ready 🧠',
-            message: 'Your 2 free daily cognitive quiz sessions are unlocked! Train your brain today.',
+            message: 'Today\'s Daily Quiz is ready in the Daily tab.',
             icon: Icons.psychology_rounded,
             duration: const Duration(seconds: 5),
           );

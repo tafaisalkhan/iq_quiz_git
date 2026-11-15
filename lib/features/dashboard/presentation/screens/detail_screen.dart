@@ -9,6 +9,7 @@ import '../../../../core/config/app_config.dart';
 import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/animated_card.dart';
+import '../../../../core/widgets/answer_sparkles.dart';
 import '../../../settings/presentation/providers/ad_provider.dart';
 import '../../../settings/presentation/providers/app_settings_provider.dart';
 import '../providers/quiz_schedule_provider.dart';
@@ -75,8 +76,10 @@ class CirclePatternPainter extends CustomPainter {
 
         final angle = startAngle + sweepAngle / 2;
         final labelRadius = radius * 0.55;
-        final x = center.dx + labelRadius * math.cos(angle) - textPainter.width / 2;
-        final y = center.dy + labelRadius * math.sin(angle) - textPainter.height / 2;
+        final x =
+            center.dx + labelRadius * math.cos(angle) - textPainter.width / 2;
+        final y =
+            center.dy + labelRadius * math.sin(angle) - textPainter.height / 2;
         textPainter.paint(canvas, Offset(x, y));
       }
 
@@ -192,7 +195,13 @@ class MatrixCellPainter extends CustomPainter {
 
       if (attributes.containsKey('innerShape')) {
         canvas.drawCircle(center, radius, strokePaint);
-        _drawInnerShape(canvas, center, radius * 0.5, attributes['innerShape'] as String, strokePaint);
+        _drawInnerShape(
+          canvas,
+          center,
+          radius * 0.5,
+          attributes['innerShape'] as String,
+          strokePaint,
+        );
       } else {
         canvas.drawCircle(center, radius, strokePaint);
       }
@@ -211,7 +220,8 @@ class MatrixCellPainter extends CustomPainter {
         path.moveTo(0, 0);
         path.lineTo(size.width, 0);
         path.lineTo(size.width / 2, size.height);
-      } else { // 'left'
+      } else {
+        // 'left'
         path.moveTo(size.width, 0);
         path.lineTo(0, size.height / 2);
         path.lineTo(size.width, size.height);
@@ -230,12 +240,21 @@ class MatrixCellPainter extends CustomPainter {
       final colorStr = attributes['color'] as String? ?? '#FFEF4444';
       final houseColor = _parseHexColor(colorStr);
 
-      final bodyPaint = Paint()..color = houseColor..style = PaintingStyle.fill;
-      final bodyRect = Rect.fromLTRB(size.width * 0.15, size.height * 0.4, size.width * 0.85, size.height * 0.95);
+      final bodyPaint = Paint()
+        ..color = houseColor
+        ..style = PaintingStyle.fill;
+      final bodyRect = Rect.fromLTRB(
+        size.width * 0.15,
+        size.height * 0.4,
+        size.width * 0.85,
+        size.height * 0.95,
+      );
       canvas.drawRect(bodyRect, bodyPaint);
       canvas.drawRect(bodyRect, strokePaint);
 
-      final roofPaint = Paint()..color = Colors.brown..style = PaintingStyle.fill;
+      final roofPaint = Paint()
+        ..color = Colors.brown
+        ..style = PaintingStyle.fill;
       final roofPath = Path();
       if (roof == 'triangular') {
         roofPath.moveTo(size.width / 2, size.height * 0.05);
@@ -246,24 +265,42 @@ class MatrixCellPainter extends CustomPainter {
         roofPath.lineTo(size.width * 0.85, size.height * 0.25);
         roofPath.lineTo(size.width * 0.85, size.height * 0.4);
         roofPath.lineTo(size.width * 0.15, size.height * 0.4);
-      } else { // 'curved'
+      } else {
+        // 'curved'
         roofPath.moveTo(size.width * 0.1, size.height * 0.4);
-        roofPath.quadraticBezierTo(size.width / 2, size.height * 0.05, size.width * 0.9, size.height * 0.4);
+        roofPath.quadraticBezierTo(
+          size.width / 2,
+          size.height * 0.05,
+          size.width * 0.9,
+          size.height * 0.4,
+        );
       }
       roofPath.close();
       canvas.drawPath(roofPath, roofPaint);
       canvas.drawPath(roofPath, strokePaint);
 
-      final doorPaint = Paint()..color = isDark ? Colors.white38 : Colors.black87..style = PaintingStyle.fill;
-      final doorRect = Rect.fromLTRB(size.width * 0.4, size.height * 0.65, size.width * 0.6, size.height * 0.95);
+      final doorPaint = Paint()
+        ..color = isDark ? Colors.white38 : Colors.black87
+        ..style = PaintingStyle.fill;
+      final doorRect = Rect.fromLTRB(
+        size.width * 0.4,
+        size.height * 0.65,
+        size.width * 0.6,
+        size.height * 0.95,
+      );
       if (door == 'rectangular' || door == 'square') {
         canvas.drawRect(doorRect, doorPaint);
         canvas.drawRect(doorRect, strokePaint);
-      } else { // 'arched'
+      } else {
+        // 'arched'
         final doorPath = Path();
         doorPath.moveTo(size.width * 0.4, size.height * 0.95);
         doorPath.lineTo(size.width * 0.4, size.height * 0.75);
-        doorPath.arcToPoint(Offset(size.width * 0.6, size.height * 0.75), radius: Radius.circular(size.width * 0.15), clockwise: true);
+        doorPath.arcToPoint(
+          Offset(size.width * 0.6, size.height * 0.75),
+          radius: Radius.circular(size.width * 0.15),
+          clockwise: true,
+        );
         doorPath.lineTo(size.width * 0.6, size.height * 0.95);
         doorPath.close();
         canvas.drawPath(doorPath, doorPaint);
@@ -296,33 +333,62 @@ class MatrixCellPainter extends CustomPainter {
       canvas.drawRect(rect, strokePaint);
 
       if (attributes.containsKey('innerShape')) {
-        _drawInnerShape(canvas, center, size.width * 0.25, attributes['innerShape'] as String, strokePaint);
+        _drawInnerShape(
+          canvas,
+          center,
+          size.width * 0.25,
+          attributes['innerShape'] as String,
+          strokePaint,
+        );
       } else if (attributes.containsKey('lines')) {
         final lines = attributes['lines'] as int;
         final direction = attributes['direction'] as String? ?? 'vertical';
         if (direction == 'vertical') {
           final double step = size.width / (lines + 1);
           for (int i = 1; i <= lines; i++) {
-            canvas.drawLine(Offset(i * step, 0), Offset(i * step, size.height), strokePaint);
+            canvas.drawLine(
+              Offset(i * step, 0),
+              Offset(i * step, size.height),
+              strokePaint,
+            );
           }
         } else if (direction == 'horizontal') {
           final double step = size.height / (lines + 1);
           for (int i = 1; i <= lines; i++) {
-            canvas.drawLine(Offset(0, i * step), Offset(size.width, i * step), strokePaint);
+            canvas.drawLine(
+              Offset(0, i * step),
+              Offset(size.width, i * step),
+              strokePaint,
+            );
           }
-        } else { // 'diagonal'
+        } else {
+          // 'diagonal'
           final double step = size.width / (lines + 1);
           for (int i = 1; i <= lines; i++) {
-            canvas.drawLine(Offset(i * step, 0), Offset(0, i * step), strokePaint);
+            canvas.drawLine(
+              Offset(i * step, 0),
+              Offset(0, i * step),
+              strokePaint,
+            );
           }
         }
       }
     }
   }
 
-  void _drawInnerShape(Canvas canvas, Offset center, double sizeVal, String shape, Paint paint) {
+  void _drawInnerShape(
+    Canvas canvas,
+    Offset center,
+    double sizeVal,
+    String shape,
+    Paint paint,
+  ) {
     if (shape == 'square') {
-      final rect = Rect.fromCenter(center: center, width: sizeVal * 2, height: sizeVal * 2);
+      final rect = Rect.fromCenter(
+        center: center,
+        width: sizeVal * 2,
+        height: sizeVal * 2,
+      );
       canvas.drawRect(rect, paint);
     } else if (shape == 'triangle') {
       final path = Path();
@@ -337,7 +403,9 @@ class MatrixCellPainter extends CustomPainter {
   }
 
   void _drawDots(Canvas canvas, Offset center, double dotSize, int count) {
-    final paint = Paint()..color = isDark ? Colors.white70 : Colors.black87..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = isDark ? Colors.white70 : Colors.black87
+      ..style = PaintingStyle.fill;
     if (count == 1) {
       canvas.drawCircle(center, 4, paint);
     } else if (count == 2) {
@@ -424,10 +492,7 @@ class MatrixCellWidget extends StatelessWidget {
 class PatternMatrixGridWidget extends StatelessWidget {
   final List<dynamic> matrixData;
 
-  const PatternMatrixGridWidget({
-    super.key,
-    required this.matrixData,
-  });
+  const PatternMatrixGridWidget({super.key, required this.matrixData});
 
   @override
   Widget build(BuildContext context) {
@@ -439,7 +504,9 @@ class PatternMatrixGridWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
       ),
       child: GridView.count(
         crossAxisCount: 3,
@@ -454,12 +521,15 @@ class PatternMatrixGridWidget extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark ? AppColors.bgDark : AppColors.bgLight,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
             ),
             padding: const EdgeInsets.all(8),
             child: MatrixCellWidget(
               shapeType: cell['shapeType'] as String,
-              attributes: (cell['attributes'] as Map<String, dynamic>?) ?? const {},
+              attributes:
+                  (cell['attributes'] as Map<String, dynamic>?) ?? const {},
               size: 46,
             ),
           );
@@ -483,7 +553,8 @@ class SlidingWindowVisualizer extends StatefulWidget {
   });
 
   @override
-  State<SlidingWindowVisualizer> createState() => _SlidingWindowVisualizerState();
+  State<SlidingWindowVisualizer> createState() =>
+      _SlidingWindowVisualizerState();
 }
 
 class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
@@ -492,7 +563,8 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
   @override
   void didUpdateWidget(covariant SlidingWindowVisualizer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.array.length != oldWidget.array.length || widget.windowSize != oldWidget.windowSize) {
+    if (widget.array.length != oldWidget.array.length ||
+        widget.windowSize != oldWidget.windowSize) {
       _startIndex = 0;
     }
   }
@@ -520,7 +592,9 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
@@ -563,7 +637,11 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
                           : (isDark ? AppColors.bgDark : AppColors.bgLight),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: inWindow ? widget.themeColor : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                        color: inWindow
+                            ? widget.themeColor
+                            : (isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight),
                         width: inWindow ? 2.5 : 1.0,
                       ),
                     ),
@@ -572,10 +650,14 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
                         '${elements[index]}',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          fontWeight: inWindow ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: inWindow
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: inWindow
                               ? widget.themeColor
-                              : (isDark ? Colors.white70 : AppColors.textPrimaryLight),
+                              : (isDark
+                                    ? Colors.white70
+                                    : AppColors.textPrimaryLight),
                         ),
                       ),
                     ),
@@ -597,11 +679,17 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
                     children: [
                       Text(
                         'Window Elements:',
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                       Text(
                         '${elements.sublist(_startIndex, endIdx)}',
-                        style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -611,7 +699,10 @@ class _SlidingWindowVisualizerState extends State<SlidingWindowVisualizer> {
                     children: [
                       Text(
                         'Window Sum (K=$safeWindowSize):',
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                       Text(
                         '${elements.sublist(_startIndex, endIdx).join(' + ')} = $currentSum',
@@ -681,7 +772,8 @@ class VariableWindowVisualizer extends StatefulWidget {
   });
 
   @override
-  State<VariableWindowVisualizer> createState() => _VariableWindowVisualizerState();
+  State<VariableWindowVisualizer> createState() =>
+      _VariableWindowVisualizerState();
 }
 
 class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
@@ -752,7 +844,9 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
@@ -795,7 +889,11 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
                           : (isDark ? AppColors.bgDark : AppColors.bgLight),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: inWindow ? widget.themeColor : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                        color: inWindow
+                            ? widget.themeColor
+                            : (isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight),
                         width: inWindow ? 2.5 : 1.0,
                       ),
                     ),
@@ -804,10 +902,14 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
                         '${_elements[index]}',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          fontWeight: inWindow ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: inWindow
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: inWindow
                               ? widget.themeColor
-                              : (isDark ? Colors.white70 : AppColors.textPrimaryLight),
+                              : (isDark
+                                    ? Colors.white70
+                                    : AppColors.textPrimaryLight),
                         ),
                       ),
                     ),
@@ -827,12 +929,33 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
                   width: 44,
                   alignment: Alignment.center,
                   child: isL && isR
-                      ? Text('L,R', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: widget.themeColor))
+                      ? Text(
+                          'L,R',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: widget.themeColor,
+                          ),
+                        )
                       : isL
-                          ? Text('L (Left)', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: widget.themeColor))
-                          : isR
-                              ? Text('R (Right)', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.blueGrey))
-                              : const SizedBox(height: 12),
+                      ? Text(
+                          'L (Left)',
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: widget.themeColor,
+                          ),
+                        )
+                      : isR
+                      ? Text(
+                          'R (Right)',
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey,
+                          ),
+                        )
+                      : const SizedBox(height: 12),
                 );
               }),
             ),
@@ -848,24 +971,18 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Active Window:', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
+                      Text(
+                        'Active Window:',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
                       Text(
                         '${_elements.sublist(_left, _right)}',
-                        style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Window Sum:', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                      Text(
-                        '$_currentSum (Target: ${widget.targetSum})',
                         style: GoogleFonts.outfit(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          color: _currentSum >= widget.targetSum ? AppColors.success : widget.themeColor,
                         ),
                       ),
                     ],
@@ -874,7 +991,36 @@ class _VariableWindowVisualizerState extends State<VariableWindowVisualizer> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Min Subarray Length found:', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
+                      Text(
+                        'Window Sum:',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        '$_currentSum (Target: ${widget.targetSum})',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: _currentSum >= widget.targetSum
+                              ? AppColors.success
+                              : widget.themeColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Min Subarray Length found:',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
                       Text(
                         minLenVal == 0 ? 'None' : '$minLenVal',
                         style: GoogleFonts.outfit(
@@ -1006,7 +1152,9 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
@@ -1048,9 +1196,11 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                           : (isDark ? AppColors.bgDark : AppColors.bgLight),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isActive 
-                            ? (found ? AppColors.success : widget.themeColor) 
-                            : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                        color: isActive
+                            ? (found ? AppColors.success : widget.themeColor)
+                            : (isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight),
                         width: isActive ? 2.5 : 1.0,
                       ),
                     ),
@@ -1059,10 +1209,14 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                         '${elements[index]}',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: isActive
                               ? (found ? AppColors.success : widget.themeColor)
-                              : (isDark ? Colors.white70 : AppColors.textPrimaryLight),
+                              : (isDark
+                                    ? Colors.white70
+                                    : AppColors.textPrimaryLight),
                         ),
                       ),
                     ),
@@ -1090,24 +1244,24 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                             ),
                           )
                         : isLeft
-                            ? Text(
-                                'L (Left)',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: widget.themeColor,
-                                ),
-                              )
-                            : isRight
-                                ? Text(
-                                    'R (Right)',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: widget.themeColor,
-                                    ),
-                                  )
-                                : const SizedBox(height: 12),
+                        ? Text(
+                            'L (Left)',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: widget.themeColor,
+                            ),
+                          )
+                        : isRight
+                        ? Text(
+                            'R (Right)',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: widget.themeColor,
+                            ),
+                          )
+                        : const SizedBox(height: 12),
                   );
                 }),
               ),
@@ -1127,11 +1281,17 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                   children: [
                     Text(
                       'Pointers State:',
-                      style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
                     ),
                     Text(
                       'L index: $_leftIndex (Val: ${elements[_leftIndex]}), R index: $_rightIndex (Val: ${elements[_rightIndex]})',
-                      style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.outfit(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -1141,7 +1301,10 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                   children: [
                     Text(
                       'Current Sum:',
-                      style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
                     ),
                     Text(
                       '${elements[_leftIndex]} + ${elements[_rightIndex]} = $currentSum (Target: ${widget.targetSum})',
@@ -1150,7 +1313,9 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
                         fontWeight: FontWeight.bold,
                         color: found
                             ? AppColors.success
-                            : (currentSum > widget.targetSum ? AppColors.error : widget.themeColor),
+                            : (currentSum > widget.targetSum
+                                  ? AppColors.error
+                                  : widget.themeColor),
                       ),
                     ),
                   ],
@@ -1169,14 +1334,21 @@ class _TwoPointersVisualizerState extends State<TwoPointersVisualizer> {
               ),
               if (found)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 16),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.success,
+                        size: 16,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'Target Found! 🎉',
@@ -1249,7 +1421,10 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
     for (int i = 0; i < widget.nodeCount - 1; i++) {
       _connections[i] = i + 1;
     }
-    final loopBackIdx = math.max(0, math.min(widget.cycleStart - 1, widget.nodeCount - 1));
+    final loopBackIdx = math.max(
+      0,
+      math.min(widget.cycleStart - 1, widget.nodeCount - 1),
+    );
     _connections[widget.nodeCount - 1] = loopBackIdx;
 
     setState(() {
@@ -1287,7 +1462,9 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
@@ -1331,18 +1508,22 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
                             color: (isSlow && isFast)
                                 ? Colors.purple.withOpacity(0.12)
                                 : isSlow
-                                    ? Colors.orange.withOpacity(0.12)
-                                    : isFast
-                                        ? Colors.blue.withOpacity(0.12)
-                                        : (isDark ? AppColors.bgDark : AppColors.bgLight),
+                                ? Colors.orange.withOpacity(0.12)
+                                : isFast
+                                ? Colors.blue.withOpacity(0.12)
+                                : (isDark
+                                      ? AppColors.bgDark
+                                      : AppColors.bgLight),
                             border: Border.all(
                               color: (isSlow && isFast)
                                   ? Colors.purple
                                   : isSlow
-                                      ? Colors.orange
-                                      : isFast
-                                          ? Colors.blue
-                                          : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                                  ? Colors.orange
+                                  : isFast
+                                  ? Colors.blue
+                                  : (isDark
+                                        ? AppColors.borderDark
+                                        : AppColors.borderLight),
                               width: (isSlow || isFast) ? 2.5 : 1.0,
                             ),
                           ),
@@ -1351,7 +1532,9 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
                               '${index + 1}',
                               style: GoogleFonts.outfit(
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textPrimaryLight,
                               ),
                             ),
                           ),
@@ -1360,14 +1543,39 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
                         SizedBox(
                           height: 14,
                           child: (isSlow && isFast)
-                              ? Text('S,F', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.purple))
+                              ? Text(
+                                  'S,F',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.purple,
+                                  ),
+                                )
                               : isSlow
-                                  ? Text('Slow', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.orange))
-                                  : isFast
-                                      ? Text('Fast', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.blue))
-                                      : hasCycle
-                                          ? const Icon(Icons.loop_rounded, size: 12, color: Colors.grey)
-                                          : const SizedBox.shrink(),
+                              ? Text(
+                                  'Slow',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
+                                  ),
+                                )
+                              : isFast
+                              ? Text(
+                                  'Fast',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
+                                  ),
+                                )
+                              : hasCycle
+                              ? const Icon(
+                                  Icons.loop_rounded,
+                                  size: 12,
+                                  color: Colors.grey,
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     ),
@@ -1385,7 +1593,11 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
           const SizedBox(height: 8),
           Text(
             'Cycle connects Node ${widget.nodeCount} back to Node ${widget.cycleStart}',
-            style: GoogleFonts.inter(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
           ),
           const SizedBox(height: 16),
           Container(
@@ -1399,24 +1611,62 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Steps Count:', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                    Text('$_steps steps', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Steps Count:',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      '$_steps steps',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Slow Pointer index (1x speed):', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                    Text('Node ${_slow + 1}', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.orange)),
+                    Text(
+                      'Slow Pointer index (1x speed):',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      'Node ${_slow + 1}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Fast Pointer index (2x speed):', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                    Text('Node ${_fast + 1}', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                    Text(
+                      'Fast Pointer index (2x speed):',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      'Node ${_fast + 1}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -1433,18 +1683,29 @@ class _FastSlowVisualizerState extends State<FastSlowVisualizer> {
               ),
               if (_met)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.purple.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.flash_on_rounded, color: Colors.purple, size: 16),
+                      const Icon(
+                        Icons.flash_on_rounded,
+                        color: Colors.purple,
+                        size: 16,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'Pointers Met at Node ${_slow + 1}! Loop Detected 🏁',
-                        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.purple),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple,
+                        ),
                       ),
                     ],
                   ),
@@ -1539,7 +1800,9 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
@@ -1581,19 +1844,23 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
                     height: 44,
                     decoration: BoxDecoration(
                       color: isDuplicateExceeded
-                          ? (isDark ? Colors.grey.withOpacity(0.05) : Colors.grey.withOpacity(0.1))
+                          ? (isDark
+                                ? Colors.grey.withOpacity(0.05)
+                                : Colors.grey.withOpacity(0.1))
                           : wasWritten
-                              ? AppColors.success.withOpacity(0.12)
-                              : (isDark ? AppColors.bgDark : AppColors.bgLight),
+                          ? AppColors.success.withOpacity(0.12)
+                          : (isDark ? AppColors.bgDark : AppColors.bgLight),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isDuplicateExceeded
                             ? Colors.grey.withOpacity(0.2)
                             : isW
-                                ? widget.themeColor
-                                : isR
-                                    ? Colors.blue
-                                    : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                            ? widget.themeColor
+                            : isR
+                            ? Colors.blue
+                            : (isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight),
                         width: (isW || isR) ? 2.5 : 1.0,
                       ),
                     ),
@@ -1602,13 +1869,19 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
                         '${_elements[index]}',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          decoration: isDuplicateExceeded ? TextDecoration.lineThrough : null,
-                          fontWeight: (isW || isR) ? FontWeight.bold : FontWeight.normal,
+                          decoration: isDuplicateExceeded
+                              ? TextDecoration.lineThrough
+                              : null,
+                          fontWeight: (isW || isR)
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: isDuplicateExceeded
                               ? Colors.grey
                               : wasWritten
-                                  ? AppColors.success
-                                  : (isDark ? Colors.white70 : AppColors.textPrimaryLight),
+                              ? AppColors.success
+                              : (isDark
+                                    ? Colors.white70
+                                    : AppColors.textPrimaryLight),
                         ),
                       ),
                     ),
@@ -1628,12 +1901,33 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
                   width: 44,
                   alignment: Alignment.center,
                   child: isW && isR
-                      ? Text('W,R', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.purple))
+                      ? Text(
+                          'W,R',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple,
+                          ),
+                        )
                       : isW
-                          ? Text('W (Write)', style: GoogleFonts.inter(fontSize: 8, fontWeight: FontWeight.bold, color: widget.themeColor))
-                          : isR
-                              ? Text('R (Read)', style: GoogleFonts.inter(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.blue))
-                              : const SizedBox(height: 12),
+                      ? Text(
+                          'W (Write)',
+                          style: GoogleFonts.inter(
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                            color: widget.themeColor,
+                          ),
+                        )
+                      : isR
+                      ? Text(
+                          'R (Read)',
+                          style: GoogleFonts.inter(
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        )
+                      : const SizedBox(height: 12),
                 );
               }),
             ),
@@ -1649,24 +1943,63 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Writer Pointer (tracks unique insert idx):', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                      Text('Index $_writer', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: widget.themeColor)),
+                      Text(
+                        'Writer Pointer (tracks unique insert idx):',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        'Index $_writer',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: widget.themeColor,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Reader Pointer (scanning elements):', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                      Text('Index $_reader', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                      Text(
+                        'Reader Pointer (scanning elements):',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        'Index $_reader',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Unique Count Found:', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                      Text('$_writer elements', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.success)),
+                      Text(
+                        'Unique Count Found:',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        '$_writer elements',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.success,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -1683,18 +2016,29 @@ class _ReaderWriterVisualizerState extends State<ReaderWriterVisualizer> {
                 ),
                 if (_isFinished)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.success.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 16),
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.success,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'Completed! Unique subset length: $_writer',
-                          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.success),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.success,
+                          ),
                         ),
                       ],
                     ),
@@ -1724,6 +2068,8 @@ class DetailScreen extends ConsumerStatefulWidget {
   final IconData icon;
   final Color color;
   final List<dynamic> questions;
+  final Future<void> Function(int score, int total)? onQuizCompleted;
+  final bool isDailyChallenge;
 
   const DetailScreen({
     super.key,
@@ -1733,6 +2079,8 @@ class DetailScreen extends ConsumerStatefulWidget {
     required this.icon,
     required this.color,
     this.questions = const [],
+    this.onQuizCompleted,
+    this.isDailyChallenge = false,
   });
 
   @override
@@ -1751,8 +2099,12 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   bool _isQuizCompleted = false;
 
   // Sandbox controllers
-  final TextEditingController _arrayController = TextEditingController(text: '2, 1, 5, 1, 3, 2');
-  final TextEditingController _paramController = TextEditingController(text: '3');
+  final TextEditingController _arrayController = TextEditingController(
+    text: '2, 1, 5, 1, 3, 2',
+  );
+  final TextEditingController _paramController = TextEditingController(
+    text: '3',
+  );
   String _sandboxAlgo = 'fixed_window';
 
   // Parsed values for Sandbox
@@ -1761,6 +2113,13 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
   // Question Timer State
   Timer? _questionTimer;
+  Timer? _answerFeedbackTimer;
+  Timer? _sparkleTimer;
+  bool _showSparkles = false;
+  int _sparkleBurst = 0;
+  final AudioPlayer _rightAnswerPlayer = AudioPlayer();
+  final AudioPlayer _wrongAnswerPlayer = AudioPlayer();
+  final AudioPlayer _applausePlayer = AudioPlayer();
   int _questionTimerSeconds = 30;
   int _maxTimerSeconds = 30;
 
@@ -1768,12 +2127,36 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   void initState() {
     super.initState();
     _currentMode = widget.id == 'dsa' ? 'landing' : 'test';
+    unawaited(_loadAnswerSounds());
     _resetQuiz();
+  }
+
+  Future<void> _loadAnswerSounds() async {
+    try {
+      await Future.wait([
+        _rightAnswerPlayer.setAsset('assets/audio/right_answer.mp3'),
+        _wrongAnswerPlayer.setAsset('assets/audio/wrong_answer.mp3'),
+        _applausePlayer.setAsset('assets/audio/applause.wav'),
+      ]);
+    } catch (_) {}
+  }
+
+  Future<void> _playAnswerSound(bool correct) async {
+    final player = correct ? _rightAnswerPlayer : _wrongAnswerPlayer;
+    try {
+      await player.seek(Duration.zero);
+      unawaited(player.play());
+    } catch (_) {}
   }
 
   @override
   void dispose() {
     _questionTimer?.cancel();
+    _answerFeedbackTimer?.cancel();
+    _sparkleTimer?.cancel();
+    _rightAnswerPlayer.dispose();
+    _wrongAnswerPlayer.dispose();
+    _applausePlayer.dispose();
     _arrayController.dispose();
     _paramController.dispose();
     super.dispose();
@@ -1812,7 +2195,10 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   }
 
   void _resetQuiz() {
+    _answerFeedbackTimer?.cancel();
+    _sparkleTimer?.cancel();
     setState(() {
+      _showSparkles = false;
       _currentQuestionIndex = 0;
       _selectedOptionIndex = null;
       _hasAnswered = false;
@@ -1828,18 +2214,37 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
     final question = widget.questions[_currentQuestionIndex];
     final correctIndex = question['correctOptionIndex'] as int;
+    final isCorrect = _selectedOptionIndex == correctIndex;
 
     setState(() {
       _hasAnswered = true;
-      if (_selectedOptionIndex == correctIndex) {
+      if (isCorrect) {
         _score++;
+        _showSparkles = true;
+        _sparkleBurst++;
       } else {
         // Vibrate when user selects wrong answer
         HapticFeedback.vibrate();
       }
     });
+    unawaited(_playAnswerSound(isCorrect));
+    if (isCorrect) {
+      _sparkleTimer?.cancel();
+      _sparkleTimer = Timer(const Duration(milliseconds: 950), () {
+        if (mounted) setState(() => _showSparkles = false);
+      });
+    }
 
-    _showExplanationBottomSheet();
+    // Show the highlighted choices before opening the explanation.
+    final answeredQuestionIndex = _currentQuestionIndex;
+    _answerFeedbackTimer?.cancel();
+    _answerFeedbackTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted &&
+          _currentQuestionIndex == answeredQuestionIndex &&
+          _hasAnswered) {
+        _showExplanationBottomSheet();
+      }
+    });
   }
 
   void _showExplanationBottomSheet({bool isTimeout = false}) {
@@ -1847,8 +2252,18 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
     final correctIndex = question['correctOptionIndex'] as int;
     final isCorrect = !isTimeout && _selectedOptionIndex == correctIndex;
     final options = (question['options'] as List<dynamic>?) ?? [];
-    final correctOptionText = correctIndex < options.length ? options[correctIndex].toString() : '';
-    final explanation = (question['explanation'] as String?) ?? 'No detailed explanation available.';
+    final correctOptionText = correctIndex < options.length
+        ? options[correctIndex].toString()
+        : '';
+    final selectedOptionText = isTimeout
+        ? 'No answer selected (time ran out)'
+        : (_selectedOptionIndex != null &&
+                  _selectedOptionIndex! < options.length
+              ? options[_selectedOptionIndex!].toString()
+              : 'No answer selected');
+    final explanation =
+        (question['explanation'] as String?) ??
+        'No detailed explanation available.';
 
     showDialog(
       context: context,
@@ -1857,108 +2272,194 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return Dialog(
           backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: (isCorrect ? AppColors.success : AppColors.error).withOpacity(0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isCorrect ? Icons.check_circle_rounded : (isTimeout ? Icons.timer_off_rounded : Icons.cancel_rounded),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color:
+                                (isCorrect
+                                        ? AppColors.success
+                                        : AppColors.error)
+                                    .withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isCorrect
+                                ? Icons.check_circle_rounded
+                                : (isTimeout
+                                      ? Icons.timer_off_rounded
+                                      : Icons.cancel_rounded),
+                            color: isCorrect
+                                ? AppColors.success
+                                : AppColors.error,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isCorrect
+                                    ? 'Correct Answer!'
+                                    : (isTimeout ? 'Time\'s Up!' : 'Incorrect'),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isCorrect
+                                      ? AppColors.success
+                                      : AppColors.error,
+                                ),
+                              ),
+                              Text(
+                                isCorrect
+                                    ? 'Your reasoning matched the correct answer.'
+                                    : 'Review your choice and the correct answer below.',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'YOUR ANSWER',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
                         color: isCorrect ? AppColors.success : AppColors.error,
-                        size: 24,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isCorrect ? 'Correct Answer!' : (isTimeout ? 'Time\'s Up!' : 'Incorrect'),
-                            style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: isCorrect ? AppColors.success : AppColors.error,
-                            ),
+                    const SizedBox(height: 4),
+                    Text(
+                      selectedOptionText,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isCorrect ? AppColors.success : AppColors.error,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'CORRECT ANSWER',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.success,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      correctOptionText,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.success,
+                      ),
+                    ),
+                    if (!isCorrect && !isTimeout) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                        'WHY YOUR ANSWER IS INCORRECT',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'The reasoning below leads to the correct answer, not the option you selected.',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Text(
+                      isCorrect
+                          ? 'WHY THIS IS CORRECT'
+                          : 'WHY THIS ANSWER IS CORRECT',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.info,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.3,
+                      ),
+                      child: SingleChildScrollView(
+                        child: Text(
+                          explanation,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            height: 1.45,
+                            color: isDark ? Colors.white70 : Colors.black87,
                           ),
-                          Text(
-                            'Correct: $correctOptionText',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white70 : Colors.black87,
-                            ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _nextQuestion();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: widget.color,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
+                        ),
+                        child: Text(
+                          _currentQuestionIndex + 1 == widget.questions.length
+                              ? 'Finish Quiz'
+                              : 'Next Question',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'EXPLANATION',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.info,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.3,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      explanation,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        height: 1.45,
-                        color: isDark ? Colors.white70 : Colors.black87,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _nextQuestion();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.color,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      _currentQuestionIndex + 1 == widget.questions.length
-                          ? 'Finish Quiz'
-                          : 'Next Question',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -1983,27 +2484,41 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
         void onQuizFinished() {
           if (!mounted) return;
-          final double percent = widget.questions.isNotEmpty ? (_score / widget.questions.length) : 0.0;
+          final double percent = widget.questions.isNotEmpty
+              ? (_score / widget.questions.length)
+              : 0.0;
           setState(() {
             _isQuizCompleted = true;
           });
           // Run clapping sound when user completes quiz successfully (score >= 50%)
           if (percent >= 0.5) {
             try {
-              final player = AudioPlayer();
-              player.setAsset('assets/audio/applause.wav').then((_) => player.play());
+              unawaited(
+                _applausePlayer
+                    .seek(Duration.zero)
+                    .then((_) => _applausePlayer.play()),
+              );
             } catch (_) {}
           }
 
-          ref.read(quizScheduleProvider.notifier).addResult(
-            TestResult(
-              id: 'res-${DateTime.now().millisecondsSinceEpoch}',
-              categoryTitle: widget.title,
-              score: _score,
-              totalQuestions: widget.questions.length,
-              date: DateTime.now(),
-            ),
+          if (!widget.isDailyChallenge) {
+            ref
+                .read(quizScheduleProvider.notifier)
+                .addResult(
+                  TestResult(
+                    id: 'res-${DateTime.now().millisecondsSinceEpoch}',
+                    categoryTitle: widget.title,
+                    score: _score,
+                    totalQuestions: widget.questions.length,
+                    date: DateTime.now(),
+                  ),
+                );
+          }
+          final completion = widget.onQuizCompleted?.call(
+            _score,
+            widget.questions.length,
           );
+          if (completion != null) unawaited(completion);
         }
 
         if (showAd) {
@@ -2045,10 +2560,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.outfit(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -2058,7 +2570,15 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           },
         ),
       ),
-      body: _buildBody(context, isDark),
+      body: Stack(
+        children: [
+          _buildBody(context, isDark),
+          if (_showSparkles)
+            Positioned.fill(
+              child: AnswerSparkles(key: ValueKey(_sparkleBurst)),
+            ),
+        ],
+      ),
     );
   }
 
@@ -2070,8 +2590,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
         return widget.questions.isEmpty
             ? _buildEmptyState(context, isDark)
             : _isQuizCompleted
-                ? _buildCompletionState(context, isDark)
-                : _buildQuizState(context, isDark);
+            ? _buildCompletionState(context, isDark)
+            : _buildQuizState(context, isDark);
       case 'landing':
       default:
         return _buildLandingState(context, isDark);
@@ -2129,7 +2649,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
               fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
             ),
           ),
           const SizedBox(height: 16),
@@ -2160,7 +2682,11 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           color: AppColors.secondary.withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.science_rounded, color: AppColors.secondary, size: 28),
+                        child: const Icon(
+                          Icons.science_rounded,
+                          color: AppColors.secondary,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: 20),
                       Expanded(
@@ -2169,17 +2695,28 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           children: [
                             Text(
                               'Interactive Sandbox',
-                              style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.outfit(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Visualise all 5 algorithmic pointer patterns dynamically with customizable arrays.',
-                              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey, height: 1.3),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                height: 1.3,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 ),
@@ -2211,7 +2748,11 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           color: AppColors.primary.withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.quiz_rounded, color: AppColors.primary, size: 28),
+                        child: const Icon(
+                          Icons.quiz_rounded,
+                          color: AppColors.primary,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: 20),
                       Expanded(
@@ -2220,17 +2761,28 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           children: [
                             Text(
                               'Start Graded Test',
-                              style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.outfit(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Solve ${widget.questions.length} problems with instant scoring and detailed code explanations.',
-                              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey, height: 1.3),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                height: 1.3,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 ),
@@ -2266,11 +2818,26 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
             items: const [
-              DropdownMenuItem(value: 'fixed_window', child: Text('Fixed Sliding Window')),
-              DropdownMenuItem(value: 'variable_window', child: Text('Variable Sliding Window')),
-              DropdownMenuItem(value: 'opposite_pointers', child: Text('Opposite Pointers (Two Sum)')),
-              DropdownMenuItem(value: 'fast_slow', child: Text('Fast & Slow Pointers (Cycle)')),
-              DropdownMenuItem(value: 'reader_writer', child: Text('Reader & Writer (Remove Duplicates)')),
+              DropdownMenuItem(
+                value: 'fixed_window',
+                child: Text('Fixed Sliding Window'),
+              ),
+              DropdownMenuItem(
+                value: 'variable_window',
+                child: Text('Variable Sliding Window'),
+              ),
+              DropdownMenuItem(
+                value: 'opposite_pointers',
+                child: Text('Opposite Pointers (Two Sum)'),
+              ),
+              DropdownMenuItem(
+                value: 'fast_slow',
+                child: Text('Fast & Slow Pointers (Cycle)'),
+              ),
+              DropdownMenuItem(
+                value: 'reader_writer',
+                child: Text('Reader & Writer (Remove Duplicates)'),
+              ),
             ],
             onChanged: (val) {
               if (val != null) {
@@ -2338,7 +2905,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2359,10 +2928,14 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                     labelText: _sandboxAlgo == 'fast_slow'
                         ? 'Total Node Count (Linked List)'
                         : 'Array Elements (comma separated)',
-                    hintText: _sandboxAlgo == 'fast_slow' ? 'e.g. 6' : 'e.g. 2, 1, 5, 1, 3, 2',
+                    hintText: _sandboxAlgo == 'fast_slow'
+                        ? 'e.g. 6'
+                        : 'e.g. 2, 1, 5, 1, 3, 2',
                     border: const OutlineInputBorder(),
                   ),
-                  keyboardType: _sandboxAlgo == 'fast_slow' ? TextInputType.number : TextInputType.text,
+                  keyboardType: _sandboxAlgo == 'fast_slow'
+                      ? TextInputType.number
+                      : TextInputType.text,
                 ),
                 if (_sandboxAlgo != 'reader_writer') ...[
                   const SizedBox(height: 16),
@@ -2372,13 +2945,13 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       labelText: _sandboxAlgo == 'fixed_window'
                           ? 'Window Size K'
                           : _sandboxAlgo == 'fast_slow'
-                              ? 'Cycle Starts at Node Number'
-                              : 'Target Sum',
+                          ? 'Cycle Starts at Node Number'
+                          : 'Target Sum',
                       hintText: _sandboxAlgo == 'fixed_window'
                           ? 'e.g. 3'
                           : _sandboxAlgo == 'fast_slow'
-                              ? 'e.g. 3'
-                              : 'e.g. 9',
+                          ? 'e.g. 3'
+                          : 'e.g. 9',
                       border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -2416,11 +2989,18 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.help_outline_rounded, size: 64, color: widget.color.withOpacity(0.5)),
+            Icon(
+              Icons.help_outline_rounded,
+              size: 64,
+              color: widget.color.withOpacity(0.5),
+            ),
             const SizedBox(height: 16),
             Text(
               'No Questions Available',
-              style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -2461,7 +3041,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
     // Default: circular diagrams
     final int sections = (question['sections'] ?? 4) as int;
-    final List<dynamic>? rawSliceColors = question['sliceColors'] as List<dynamic>?;
+    final List<dynamic>? rawSliceColors =
+        question['sliceColors'] as List<dynamic>?;
     final List<Color> sliceColors = rawSliceColors != null
         ? rawSliceColors.map((c) => _parseHexColor(c as String)).toList()
         : const [];
@@ -2519,12 +3100,23 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
-                      color: (_questionTimerSeconds <= 5 ? AppColors.error : AppColors.primary).withOpacity(0.12),
+                      color:
+                          (_questionTimerSeconds <= 5
+                                  ? AppColors.error
+                                  : AppColors.primary)
+                              .withOpacity(0.12),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: (_questionTimerSeconds <= 5 ? AppColors.error : AppColors.primary).withOpacity(0.3),
+                        color:
+                            (_questionTimerSeconds <= 5
+                                    ? AppColors.error
+                                    : AppColors.primary)
+                                .withOpacity(0.3),
                       ),
                     ),
                     child: Row(
@@ -2533,7 +3125,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                         Icon(
                           Icons.timer_outlined,
                           size: 13,
-                          color: _questionTimerSeconds <= 5 ? AppColors.error : AppColors.primary,
+                          color: _questionTimerSeconds <= 5
+                              ? AppColors.error
+                              : AppColors.primary,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -2541,7 +3135,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: _questionTimerSeconds <= 5 ? AppColors.error : AppColors.primary,
+                            color: _questionTimerSeconds <= 5
+                                ? AppColors.error
+                                : AppColors.primary,
                           ),
                         ),
                       ],
@@ -2565,7 +3161,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: _questionTimerSeconds / _maxTimerSeconds.toDouble(),
-              backgroundColor: isDark ? AppColors.borderDark : AppColors.borderLight,
+              backgroundColor: isDark
+                  ? AppColors.borderDark
+                  : AppColors.borderLight,
               valueColor: AlwaysStoppedAnimation<Color>(
                 _questionTimerSeconds <= 5 ? AppColors.error : widget.color,
               ),
@@ -2623,7 +3221,13 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           Column(
             children: List.generate(options.length, (index) {
               final optionText = options[index] as String;
-              return _buildOptionButton(index, optionText, correctIndex, question, isDark);
+              return _buildOptionButton(
+                index,
+                optionText,
+                correctIndex,
+                question,
+                isDark,
+              );
             }),
           ),
           const SizedBox(height: 24),
@@ -2635,12 +3239,19 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   }
 
   Widget _buildOptionButton(
-      int index, String optionText, int correctIndex, Map<String, dynamic> question, bool isDark) {
+    int index,
+    String optionText,
+    int correctIndex,
+    Map<String, dynamic> question,
+    bool isDark,
+  ) {
     final isSelected = _selectedOptionIndex == index;
     final isCorrect = index == correctIndex;
 
     Color optionBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    Color optionBorderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+    Color optionBorderColor = isDark
+        ? AppColors.borderDark
+        : AppColors.borderLight;
     Color textColor = isDark ? Colors.white : AppColors.textPrimaryLight;
 
     if (_hasAnswered) {
@@ -2667,13 +3278,16 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
         if (optVisual is Map && optVisual.containsKey('shapeType')) {
           miniDiagram = MatrixCellWidget(
             shapeType: optVisual['shapeType'] as String,
-            attributes: (optVisual['attributes'] as Map<String, dynamic>?) ?? const {},
+            attributes:
+                (optVisual['attributes'] as Map<String, dynamic>?) ?? const {},
             size: 34,
           );
         } else {
           final int sections = (question['sections'] ?? 4) as int;
           if (optVisual is List) {
-            final List<Color> optColors = optVisual.map((c) => _parseHexColor(c as String)).toList();
+            final List<Color> optColors = optVisual
+                .map((c) => _parseHexColor(c as String))
+                .toList();
             miniDiagram = CirclePatternWidget(
               size: 34,
               sections: sections,
@@ -2681,7 +3295,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
             );
           } else if (optVisual is Map) {
             final int? optDotIndex = optVisual['dotIndex'] as int?;
-            final List<dynamic>? rawColors = question['sliceColors'] as List<dynamic>?;
+            final List<dynamic>? rawColors =
+                question['sliceColors'] as List<dynamic>?;
             final List<Color> mainColors = rawColors != null
                 ? rawColors.map((c) => _parseHexColor(c as String)).toList()
                 : const [];
@@ -2715,7 +3330,12 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           decoration: BoxDecoration(
             color: optionBgColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: optionBorderColor, width: isSelected || (_hasAnswered && (isCorrect || isSelected)) ? 2 : 1),
+            border: Border.all(
+              color: optionBorderColor,
+              width: isSelected || (_hasAnswered && (isCorrect || isSelected))
+                  ? 2
+                  : 1,
+            ),
           ),
           child: Row(
             children: [
@@ -2736,9 +3356,17 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
               const SizedBox(width: 8),
               if (_hasAnswered) ...[
                 if (isCorrect)
-                  const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20)
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.success,
+                    size: 20,
+                  )
                 else if (isSelected)
-                  const Icon(Icons.cancel_rounded, color: AppColors.error, size: 20)
+                  const Icon(
+                    Icons.cancel_rounded,
+                    color: AppColors.error,
+                    size: 20,
+                  ),
               ] else ...[
                 Container(
                   width: 20,
@@ -2746,7 +3374,11 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? widget.color : (isDark ? AppColors.borderDark : AppColors.borderLight),
+                      color: isSelected
+                          ? widget.color
+                          : (isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight),
                       width: 2,
                     ),
                   ),
@@ -2763,7 +3395,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                         )
                       : null,
                 ),
-              ]
+              ],
             ],
           ),
         ),
@@ -2774,148 +3406,159 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   Widget _buildCompletionState(BuildContext context, bool isDark) {
     final double percent = _score / widget.questions.length;
     String scoreTitle = 'Keep Practicing!';
-    String scoreDesc = 'You scored $_score out of ${widget.questions.length}. Focus on analyzing the patterns and try again!';
+    String scoreDesc =
+        'You scored $_score out of ${widget.questions.length}. Focus on analyzing the patterns and try again!';
 
     if (percent == 1.0) {
       scoreTitle = 'Perfect Genius! 🏆';
-      scoreDesc = 'Outstanding! You correctly solved all questions. Your logic and pattern detection is flawless.';
+      scoreDesc =
+          'Outstanding! You correctly solved all questions. Your logic and pattern detection is flawless.';
     } else if (percent >= 0.6) {
       scoreTitle = 'Great Job! ⚡';
-      scoreDesc = 'Excellent score of $_score out of ${widget.questions.length}. You have sharp analytic skills.';
+      scoreDesc =
+          'Excellent score of $_score out of ${widget.questions.length}. You have sharp analytic skills.';
     }
 
     return Stack(
       children: [
-        if (percent >= 0.5) const Positioned.fill(child: GlitterParticleOverlay()),
+        if (percent >= 0.5)
+          const Positioned.fill(child: GlitterParticleOverlay()),
         Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-            AnimatedCard(
-              delay: const Duration(milliseconds: 50),
-              child: Container(
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: widget.color.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  percent >= 0.6 ? Icons.emoji_events_rounded : Icons.psychology_rounded,
-                  color: widget.color,
-                  size: 80,
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              scoreTitle,
-              style: GoogleFonts.outfit(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : AppColors.textPrimaryLight,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                scoreDesc,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  height: 1.45,
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-
-            // Score circular meter representation
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Final Score: ',
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    '$_score / ${widget.questions.length}',
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                AnimatedCard(
+                  delay: const Duration(milliseconds: 50),
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: widget.color.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      percent >= 0.6
+                          ? Icons.emoji_events_rounded
+                          : Icons.psychology_rounded,
                       color: widget.color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 48),
-
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _resetQuiz,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      side: BorderSide(color: widget.color, width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Try Again',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: widget.color,
-                      ),
+                      size: 80,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.color,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Back to Home',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                const SizedBox(height: 32),
+                Text(
+                  scoreTitle,
+                  style: GoogleFonts.outfit(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    scoreDesc,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      height: 1.45,
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
                   ),
+                ),
+                const SizedBox(height: 40),
+
+                // Score circular meter representation
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.borderDark
+                          : AppColors.borderLight,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Final Score: ',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        '$_score / ${widget.questions.length}',
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: widget.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 48),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _resetQuiz,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          side: BorderSide(color: widget.color, width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Try Again',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: widget.color,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: widget.color,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Back to Home',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
-    ),
-  ],
-);
+      ],
+    );
   }
 }
 
@@ -2926,7 +3569,8 @@ class GlitterParticleOverlay extends StatefulWidget {
   State<GlitterParticleOverlay> createState() => _GlitterParticleOverlayState();
 }
 
-class _GlitterParticleOverlayState extends State<GlitterParticleOverlay> with SingleTickerProviderStateMixin {
+class _GlitterParticleOverlayState extends State<GlitterParticleOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   final List<_Particle> _particles = List.generate(50, (i) => _Particle());
 
@@ -2952,7 +3596,10 @@ class _GlitterParticleOverlayState extends State<GlitterParticleOverlay> with Si
       builder: (context, child) {
         return CustomPaint(
           size: Size.infinite,
-          painter: _GlitterPainter(progress: _controller.value, particles: _particles),
+          painter: _GlitterPainter(
+            progress: _controller.value,
+            particles: _particles,
+          ),
         );
       },
     );
@@ -2993,7 +3640,14 @@ class _GlitterPainter extends CustomPainter {
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(progress * p.rotationSpeed);
-      canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.6), paint);
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: p.size,
+          height: p.size * 0.6,
+        ),
+        paint,
+      );
       canvas.restore();
     }
   }

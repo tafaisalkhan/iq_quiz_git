@@ -1,25 +1,34 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../theme/app_colors.dart';
 
 class AdService {
   static final AdService _instance = AdService._internal();
   factory AdService() => _instance;
   AdService._internal();
 
-  // ── Real Production AdMob IDs ─────────────────────────────────────────────
-  // App ID:  ca-app-pub-1852108665659812~4950039925
-  static const String androidBannerId = 'ca-app-pub-1852108665659812/4653838096';
-  static const String iosBannerId     = 'ca-app-pub-1852108665659812/4653838096';
+  // ── Google Test AdMob IDs (production IDs in gitignored admob_secrets.json) ─
+  static const String androidBannerId =
+      String.fromEnvironment('ADMOB_BANNER_ID', defaultValue: 'ca-app-pub-3940256099942544/6300978111');
+  static const String iosBannerId = 'ca-app-pub-3940256099942544/2934735716';
 
-  static const String androidInterstitialId = 'ca-app-pub-1852108665659812/9000965577';
-  static const String iosInterstitialId     = 'ca-app-pub-1852108665659812/9000965577';
+  static const String androidInterstitialId =
+      String.fromEnvironment('ADMOB_INTERSTITIAL_ID', defaultValue: 'ca-app-pub-3940256099942544/1033173712');
+  static const String iosInterstitialId =
+      'ca-app-pub-3940256099942544/4411468910';
 
-  static const String androidRewardedId = 'ca-app-pub-1852108665659812/3445386569';
-  static const String iosRewardedId     = 'ca-app-pub-1852108665659812/3445386569';
+  static const String androidRewardedId =
+      String.fromEnvironment('ADMOB_REWARDED_ID', defaultValue: 'ca-app-pub-3940256099942544/5224354917');
+  static const String iosRewardedId = 'ca-app-pub-3940256099942544/1712485313';
 
   bool _isInitialized = false;
+  InterstitialAd? _interstitialAd;
+  bool _isLoadingInterstitial = false;
+
+  String get _interstitialId => defaultTargetPlatform == TargetPlatform.iOS
+      ? iosInterstitialId
+      : androidInterstitialId;
 
   /// Initialize Mobile Ads SDK
   Future<void> initialize() async {
@@ -27,60 +36,65 @@ class AdService {
     try {
       await MobileAds.instance.initialize();
       _isInitialized = true;
+      preloadInterstitial();
     } catch (_) {}
   }
 
-  /// Load and display real production Interstitial Ad with fail-safe fallback
-  void showInterstitialAd(BuildContext context, VoidCallback onAdClosed) {
-    initialize();
-    final adUnitId = Theme.of(context).platform == TargetPlatform.iOS
-        ? iosInterstitialId
-        : androidInterstitialId;
-
-    bool hasCompleted = false;
-
-    void safeOnClosed() {
-      if (!hasCompleted) {
-        hasCompleted = true;
-        onAdClosed();
-      }
+  void preloadInterstitial() {
+    if (!_isInitialized || _isLoadingInterstitial || _interstitialAd != null) {
+      return;
     }
+    _isLoadingInterstitial = true;
+    InterstitialAd.load(
+      adUnitId: _interstitialId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _isLoadingInterstitial = false;
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (_) {
+          _isLoadingInterstitial = false;
+        },
+      ),
+    );
+  }
 
-    // Fail-safe timeout: If AdMob doesn't respond in 3.5 seconds, proceed seamlessly
-    Timer(const Duration(milliseconds: 3500), () {
-      safeOnClosed();
-    });
-
+  /// Continue immediately when no ad is ready; otherwise continue after dismissal.
+  void showInterstitialAd(BuildContext context, VoidCallback onAdClosed) {
+    final ad = _interstitialAd;
+    if (ad == null) {
+      preloadInterstitial();
+      onAdClosed();
+      return;
+    }
+    _interstitialAd = null;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        preloadInterstitial();
+        onAdClosed();
+      },
+      onAdFailedToShowFullScreenContent: (ad, _) {
+        ad.dispose();
+        preloadInterstitial();
+        onAdClosed();
+      },
+    );
     try {
-      InterstitialAd.load(
-        adUnitId: adUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad) {
-            ad.fullScreenContentCallback = FullScreenContentCallback(
-              onAdDismissedFullScreenContent: (ad) {
-                ad.dispose();
-                safeOnClosed();
-              },
-              onAdFailedToShowFullScreenContent: (ad, error) {
-                ad.dispose();
-                safeOnClosed();
-              },
-            );
-            ad.show();
-          },
-          onAdFailedToLoad: (error) {
-            safeOnClosed();
-          },
-        ),
-      );
+      ad.show();
     } catch (_) {
-      safeOnClosed();
+      ad.dispose();
+      preloadInterstitial();
+      onAdClosed();
     }
   }
 
   /// Load and display real production Rewarded Ad with fail-safe fallback
-  void showRewardedAd(BuildContext context, Function(int rewardAmount) onRewardEarned) {
+  void showRewardedAd(
+    BuildContext context,
+    Function(int rewardAmount) onRewardEarned,
+  ) {
     initialize();
     final adUnitId = Theme.of(context).platform == TargetPlatform.iOS
         ? iosRewardedId
