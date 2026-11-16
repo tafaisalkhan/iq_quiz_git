@@ -31,29 +31,28 @@ class NoAdsPopup extends StatelessWidget {
     late final IconData primaryIcon;
 
     final resolvedTitle = isAdFreePurchased
-        ? 'Enjoying Ad-Free IQ Quiz!'
+        ? 'Thank You for Your Support!'
         : (isStreakReward
             ? '$streakDays-Day Streak: No Ads Today!'
             : 'No Ads Today!');
+    final prefix = isAdFreePurchased ? '' : 'Enjoy an ad-free experience today! ';
     if (actionIndex == 0) {
       headerIcon = Icons.star_rounded;
       title = resolvedTitle;
-      body =
-          'Enjoy an ad-free experience today! If you love IQ Quiz, please rate us.';
+      body = '${prefix}If you love IQ Quiz, please rate us.';
       primaryLabel = 'Rate App';
       primaryIcon = Icons.star_rounded;
     } else if (actionIndex == 1) {
       headerIcon = Icons.share_rounded;
       title = resolvedTitle;
-      body =
-          'Enjoy an ad-free experience today! Please share IQ Quiz with your friends and family.';
+      body = '${prefix}Please share IQ Quiz with your friends and family.';
       primaryLabel = 'Share With Friends';
       primaryIcon = Icons.share_rounded;
     } else {
       headerIcon = Icons.local_cafe_rounded;
       title = resolvedTitle;
       body =
-          'Enjoy an ad-free experience today! Support the developer with a \$1.99 coffee to help keep the app growing.';
+          '${prefix}Support the developer with a \$1.99 coffee to help keep the app growing.';
       primaryLabel = 'Buy Developer a Coffee (\$1.99)';
       primaryIcon = Icons.local_cafe_rounded;
     }
@@ -126,9 +125,9 @@ class NoAdsPopup extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'Enjoy Ad-Free',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              child: Text(
+                isAdFreePurchased ? 'Close' : 'Enjoy Ad-Free',
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ],
