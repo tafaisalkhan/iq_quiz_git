@@ -54,9 +54,7 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          if (error.code == 3) {
-            AdService.markNoFillTodayAndNotify(adUnitId);
-          }
+          AdService.markNoFillTodayAndNotify(adUnitId);
           if (!mounted) return;
           setState(() {
             _isAdLoaded = false;

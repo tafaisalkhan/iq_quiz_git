@@ -164,9 +164,7 @@ class AdService {
         },
         onAdFailedToLoad: (error) {
           _isLoadingInterstitial = false;
-          if (error.code == 3) {
-            markNoFillTodayAndNotify(_interstitialId);
-          }
+          markNoFillTodayAndNotify(_interstitialId);
         },
       ),
     );
