@@ -12,11 +12,13 @@ class NoAdsPopup extends StatelessWidget {
     required this.step,
     required this.isStreakReward,
     required this.streakDays,
+    this.isAdFreePurchased = false,
   });
 
   final int step;
   final bool isStreakReward;
   final int streakDays;
+  final bool isAdFreePurchased;
 
   @override
   Widget build(BuildContext context) {
@@ -28,29 +30,28 @@ class NoAdsPopup extends StatelessWidget {
     late final String primaryLabel;
     late final IconData primaryIcon;
 
+    final resolvedTitle = isAdFreePurchased
+        ? 'Enjoying Ad-Free IQ Quiz!'
+        : (isStreakReward
+            ? '$streakDays-Day Streak: No Ads Today!'
+            : 'No Ads Today!');
     if (actionIndex == 0) {
       headerIcon = Icons.star_rounded;
-      title = isStreakReward
-          ? '$streakDays-Day Streak: No Ads Today!'
-          : 'No Ads Today!';
+      title = resolvedTitle;
       body =
           'Enjoy an ad-free experience today! If you love IQ Quiz, please rate us.';
       primaryLabel = 'Rate App';
       primaryIcon = Icons.star_rounded;
     } else if (actionIndex == 1) {
       headerIcon = Icons.share_rounded;
-      title = isStreakReward
-          ? '$streakDays-Day Streak: No Ads Today!'
-          : 'No Ads Today!';
+      title = resolvedTitle;
       body =
           'Enjoy an ad-free experience today! Please share IQ Quiz with your friends and family.';
       primaryLabel = 'Share With Friends';
       primaryIcon = Icons.share_rounded;
     } else {
       headerIcon = Icons.local_cafe_rounded;
-      title = isStreakReward
-          ? '$streakDays-Day Streak: No Ads Today!'
-          : 'No Ads Today!';
+      title = resolvedTitle;
       body =
           'Enjoy an ad-free experience today! Support the developer with a \$1.99 coffee to help keep the app growing.';
       primaryLabel = 'Buy Developer a Coffee (\$1.99)';

@@ -46,7 +46,7 @@ class NotificationService {
       _isInitialized = true;
 
       // Automatically schedule a daily native system status bar notification at 10:00 AM
-      scheduleNativeDailyNotification(
+      await scheduleNativeDailyNotification(
         id: 999,
         title: 'Daily IQ Quiz Reminder 🧠',
         body: 'Your Daily Quiz is ready. Open the Daily tab to keep your record going!',

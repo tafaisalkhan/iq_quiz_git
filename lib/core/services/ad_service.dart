@@ -107,8 +107,7 @@ class AdService {
     BuildContext context, {
     required bool isAdFreePurchased,
   }) async {
-    if (isAdFreePurchased ||
-        !isAdFreeToday ||
+    if ((!isAdFreePurchased && !isAdFreeToday) ||
         _popupShownThisLaunch ||
         _dialogCurrentlyVisible) {
       return;
@@ -130,6 +129,7 @@ class AdService {
         step: currentStep,
         isStreakReward: _isStreakRewardToday,
         streakDays: _streakDays,
+        isAdFreePurchased: isAdFreePurchased,
       ),
     );
     _dialogCurrentlyVisible = false;
