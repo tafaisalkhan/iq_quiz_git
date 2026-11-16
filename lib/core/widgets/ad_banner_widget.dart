@@ -4,7 +4,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../features/settings/presentation/providers/ad_provider.dart';
 import '../config/app_config.dart';
 import '../services/ad_service.dart';
-import '../theme/app_colors.dart';
 
 class AdBannerWidget extends ConsumerStatefulWidget {
   final bool isTopBanner;
@@ -36,7 +35,7 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
   }
 
   void _loadBannerAd() {
-    if (!AppConfig.enableAds) return;
+    if (!AppConfig.enableAds || AdService.isAdFreeToday) return;
 
     final adUnitId = Theme.of(context).platform == TargetPlatform.iOS
         ? AdService.iosBannerId
@@ -55,6 +54,9 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          if (error.code == 3) {
+            AdService.markNoFillTodayAndNotify(adUnitId);
+          }
           if (!mounted) return;
           setState(() {
             _isAdLoaded = false;
@@ -81,15 +83,19 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
       return const SizedBox.shrink();
     }
 
-    if (!_isAdLoaded || _bannerAd == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      alignment: Alignment.center,
-      child: AdWidget(ad: _bannerAd!),
+    return ValueListenableBuilder<bool>(
+      valueListenable: AdService.adFreeTodayNotifier,
+      builder: (context, isAdFreeToday, _) {
+        if (isAdFreeToday || !_isAdLoaded || _bannerAd == null) {
+          return const SizedBox.shrink();
+        }
+        return Container(
+          width: _bannerAd!.size.width.toDouble(),
+          height: _bannerAd!.size.height.toDouble(),
+          alignment: Alignment.center,
+          child: AdWidget(ad: _bannerAd!),
+        );
+      },
     );
   }
 }

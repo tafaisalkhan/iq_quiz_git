@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/iap_service.dart';
+import '../../../../core/services/support_service.dart';
 import '../providers/ad_provider.dart';
 import '../providers/app_settings_provider.dart';
 
@@ -479,6 +480,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Section 4: Support & Feedback
+            _buildSectionHeader('SUPPORT & FEEDBACK'),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                ),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(
+                      Icons.star_rounded,
+                      color: Color(0xFFC68B2C),
+                    ),
+                    title: Text(
+                      'Rate App',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => SupportService.rateApp(context),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.share_rounded,
+                      color: AppColors.primary,
+                    ),
+                    title: Text(
+                      'Share With Friends',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: SupportService.shareApp,
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.local_cafe_rounded,
+                      color: Color(0xFF6F4E37),
+                    ),
+                    title: Text(
+                      'Buy Developer a Coffee (\$1.99)',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => SupportService.buyCoffee(context),
+                  ),
+                ],
               ),
             ),
           ],

@@ -11,6 +11,7 @@ class IapService {
   final InAppPurchase _iap = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   static const String removeAdsProductId = 'remove_ads';
+  static const String coffeeProductId = 'cofee';
 
   /// Initialize Google Play Billing purchase stream and check existing purchases
   void initialize(WidgetRef ref) {
@@ -33,20 +34,27 @@ class IapService {
   }
 
   /// Trigger buy flow for "remove_ads" product
-  Future<bool> buyRemoveAds() async {
+  Future<bool> buyRemoveAds() => _buyProduct(removeAdsProductId, consumable: false);
+
+  /// Trigger buy flow for "cofee" ($1.99) consumable product
+  Future<bool> buyCoffee() => _buyProduct(coffeeProductId, consumable: true);
+
+  Future<bool> _buyProduct(String productId, {required bool consumable}) async {
     try {
       if (!await _iap.isAvailable()) return false;
-      final response = await _iap.queryProductDetails({removeAdsProductId});
+      final response = await _iap.queryProductDetails({productId});
       if (response.error != null) return false;
       final products = response.productDetails.where(
-        (product) => product.id == removeAdsProductId,
+        (product) => product.id == productId,
       );
       if (products.isEmpty) return false;
       final ProductDetails productDetails = products.first;
       final PurchaseParam purchaseParam = PurchaseParam(
         productDetails: productDetails,
       );
-      return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+      return consumable
+          ? await _iap.buyConsumable(purchaseParam: purchaseParam)
+          : await _iap.buyNonConsumable(purchaseParam: purchaseParam);
     } catch (_) {
       return false;
     }

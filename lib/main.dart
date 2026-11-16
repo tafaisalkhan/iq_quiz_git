@@ -9,6 +9,7 @@ import 'features/splash/presentation/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppConfig.initialize();
+  await AdService().initDailyState();
   await AdService().initialize();
   await NotificationService().initialize();
   runApp(

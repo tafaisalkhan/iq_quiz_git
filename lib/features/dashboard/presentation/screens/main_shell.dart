@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../../../core/services/iap_service.dart';
 import '../../../../core/services/ad_service.dart';
+import '../../../../core/services/support_service.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../settings/presentation/providers/ad_provider.dart';
 import '../providers/navigation_provider.dart';
@@ -37,6 +38,11 @@ class _MainShellState extends ConsumerState<MainShell> {
   void initState() {
     super.initState();
     IapService().initialize(ref);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        SupportService.checkForAppUpdate(context);
+      }
+    });
     _screens = [
       DashboardScreen(
         onToggleTheme: widget.onToggleTheme,
@@ -73,7 +79,18 @@ class _MainShellState extends ConsumerState<MainShell> {
   void _selectDestination(int index) {
     if (index == ref.read(navigationProvider)) return;
     ref.read(navigationProvider.notifier).setIndex(index);
-    if (!AppConfig.enableAds || ref.read(adProvider).isAdFreePurchased) return;
+    final purchased = ref.read(adProvider).isAdFreePurchased;
+    if (index == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          AdService.showNoAdsPopupIfNeeded(
+            context,
+            isAdFreePurchased: purchased,
+          );
+        }
+      });
+    }
+    if (!AppConfig.enableAds || purchased || AdService.isAdFreeToday) return;
     _tabChangesSinceAd++;
     if (_tabChangesSinceAd >= 3) {
       _tabChangesSinceAd = 0;
