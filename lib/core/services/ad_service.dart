@@ -208,6 +208,10 @@ class AdService {
     BuildContext context,
     Function(int rewardAmount) onRewardEarned,
   ) {
+    if (isAdFreeToday || _noFillThisLaunch) {
+      onRewardEarned(1);
+      return;
+    }
     initialize();
     final adUnitId = Theme.of(context).platform == TargetPlatform.iOS
         ? iosRewardedId
@@ -249,6 +253,7 @@ class AdService {
             );
           },
           onAdFailedToLoad: (error) {
+            markNoFillTodayAndNotify(adUnitId);
             safeReward();
           },
         ),
