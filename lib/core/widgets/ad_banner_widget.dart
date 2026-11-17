@@ -47,6 +47,7 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
+          AdService.markAdLoadedForStreak();
           if (!mounted) return;
           setState(() {
             _isAdLoaded = true;
