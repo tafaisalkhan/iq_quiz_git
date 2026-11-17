@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -6,6 +7,19 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val dartEnvironmentVariables = mutableMapOf(
+    "ADMOB_APP_ID" to "ca-app-pub-3940256099942544~3347511713"
+)
+if (project.hasProperty("dart-defines")) {
+    project.property("dart-defines").toString().split(",").forEach { entry ->
+        val decoded = String(Base64.getDecoder().decode(entry), Charsets.UTF_8)
+        val parts = decoded.split("=", limit = 2)
+        if (parts.size == 2) {
+            dartEnvironmentVariables[parts[0]] = parts[1]
+        }
+    }
 }
 
 // Load signing properties from key.properties
@@ -45,6 +59,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["ADMOB_APP_ID"] = dartEnvironmentVariables["ADMOB_APP_ID"]!!
     }
 
     buildTypes {
