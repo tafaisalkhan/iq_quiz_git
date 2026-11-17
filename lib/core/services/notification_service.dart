@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../theme/app_colors.dart';
+import 'ad_service.dart';
 import 'daily_quiz_service.dart';
 
 class NotificationService {
@@ -46,10 +48,16 @@ class NotificationService {
       _isInitialized = true;
 
       // Automatically schedule a daily native system status bar notification at 10:00 AM
+      final prefs = await SharedPreferences.getInstance();
+      final isRemoveAds = prefs.getBool('is_ad_free_purchased_v2') ?? false;
+      final suffix = AdService.streakNotificationSuffix(
+        isRemoveAdsPurchased: isRemoveAds,
+      );
       await scheduleNativeDailyNotification(
         id: 999,
         title: 'Daily IQ Quiz Reminder 🧠',
-        body: 'Your Daily Quiz is ready. Open the Daily tab to keep your record going!',
+        body:
+            'Your Daily Quiz is ready. Open the Daily tab to keep your record going!$suffix',
         hour: 10,
         minute: 0,
       );

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -34,17 +35,18 @@ class AdService {
   static const String _prefLastOpenDate = 'iq_ad_streak_last_open_date';
   static const String _prefStreakDays = 'iq_ad_streak_days';
   static const String _prefAdFreeDate = 'iq_ad_free_date';
-  static const String _prefPopupStep = 'iq_no_ads_popup_step';
 
   static String _adFreeDate = '';
-  static int _popupStep = 0;
   static int _streakDays = 1;
   static bool _isStreakRewardToday = false;
   static bool _noFillThisLaunch = false;
   static bool _dialogCurrentlyVisible = false;
   static bool _popupShownThisLaunch = false;
+  static bool _isRemoveAdsPurchased = false;
+  static final Random _random = Random();
 
   static final ValueNotifier<bool> adFreeTodayNotifier = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isNoFillNotifier = ValueNotifier<bool>(false);
 
   static bool isValidAdUnitId(String id) {
     return RegExp(r'^ca-app-pub-\d+/\d+$').hasMatch(id.trim());
@@ -69,7 +71,6 @@ class AdService {
     final lastOpen = prefs.getString(_prefLastOpenDate) ?? '';
     _streakDays = prefs.getInt(_prefStreakDays) ?? 0;
     _adFreeDate = prefs.getString(_prefAdFreeDate) ?? '';
-    _popupStep = prefs.getInt(_prefPopupStep) ?? 0;
 
     if (lastOpen != today) {
       if (lastOpen == yesterday) {
@@ -78,16 +79,15 @@ class AdService {
         _streakDays = 1;
       }
       if (_streakDays >= streakRewardDays) {
-        _isStreakRewardToday = true;
-        _adFreeDate = today;
+        final tomorrow = _dateKey(DateTime.now().add(const Duration(days: 1)));
+        _adFreeDate = tomorrow;
         _streakDays = 0;
-        await prefs.setString(_prefAdFreeDate, today);
+        await prefs.setString(_prefAdFreeDate, tomorrow);
       }
       await prefs.setString(_prefLastOpenDate, today);
       await prefs.setInt(_prefStreakDays, _streakDays);
-    } else if (_adFreeDate == today && _streakDays == 0) {
-      _isStreakRewardToday = true;
     }
+    _isStreakRewardToday = _adFreeDate == today;
 
     if (adsPausedForSuspension) {
       _adFreeDate = today;
@@ -97,27 +97,39 @@ class AdService {
     adFreeTodayNotifier.value = isAdFreeToday;
   }
 
+  static String streakNotificationSuffix({required bool isRemoveAdsPurchased}) {
+    if (isRemoveAdsPurchased) return '';
+    final tomorrow = _dateKey(DateTime.now().add(const Duration(days: 1)));
+    if (_adFreeDate == tomorrow) {
+      return ' Streak complete! Today is 100% Ad-Free (Banner & Interstitial off)!';
+    }
+    if (_streakDays == 1) {
+      return ' Open today (Day 2/3) to get closer to a Free Ad-Free Day!';
+    }
+    if (_streakDays == 2) {
+      return ' 1 more day (Day 3/3) to unlock tomorrow Ad-Free!';
+    }
+    return '';
+  }
+
   static Future<void> markNoFillTodayAndNotify(String adUnitId) async {
     if (!isValidAdUnitId(adUnitId)) return;
     _noFillThisLaunch = true;
+    isNoFillNotifier.value = true;
   }
 
   static Future<void> showNoAdsPopupIfNeeded(
     BuildContext context, {
     required bool isAdFreePurchased,
   }) async {
-    if ((!isAdFreePurchased && !isAdFreeToday && !_noFillThisLaunch) ||
-        _popupShownThisLaunch ||
-        _dialogCurrentlyVisible) {
+    _isRemoveAdsPurchased = isAdFreePurchased;
+    if (_popupShownThisLaunch || _dialogCurrentlyVisible) {
       return;
     }
     if (ModalRoute.of(context)?.isCurrent != true) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final currentStep = _popupStep;
+    final randomStep = _random.nextInt(3);
     _popupShownThisLaunch = true;
-    _popupStep = (_popupStep + 1) % 3;
-    await prefs.setInt(_prefPopupStep, _popupStep);
 
     if (!context.mounted) return;
     _dialogCurrentlyVisible = true;
@@ -125,10 +137,11 @@ class AdService {
       context: context,
       barrierDismissible: true,
       builder: (_) => NoAdsPopup(
-        step: currentStep,
+        step: randomStep,
         isStreakReward: _isStreakRewardToday,
         streakDays: _streakDays,
         isAdFreePurchased: isAdFreePurchased,
+        isNoFill: _noFillThisLaunch,
       ),
     );
     _dialogCurrentlyVisible = false;
@@ -208,7 +221,7 @@ class AdService {
     BuildContext context,
     Function(int rewardAmount) onRewardEarned,
   ) {
-    if (isAdFreeToday || _noFillThisLaunch) {
+    if (_isRemoveAdsPurchased || adsPausedForSuspension || _noFillThisLaunch) {
       onRewardEarned(1);
       return;
     }
