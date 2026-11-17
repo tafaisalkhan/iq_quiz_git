@@ -82,7 +82,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         setState(() {
           _isLoading = false;
         });
-        NotificationService().checkAndShowDailyNotification(context);
       }
     }
   }
